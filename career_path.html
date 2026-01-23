@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | هندسة المسار المهني</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Outfit:wght@300;600;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 950px; padding-bottom: 100px;">
+        <nav class="premium-nav">
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثـــــر</div>
+                    <div class="logo-slogan">رؤية مهنية ثاقبة</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost"><i class="fas fa-home"></i> الرئيسية</a>
+            </div>
+        </nav>
+
+        <main class="anim-fade-in" style="margin-top: 50px;">
+            <div class="glass-card main-input-card">
+                <div class="card-header-icon" style="color: var(--primary);">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h1>خريطة الطريق المهنية</h1>
+                <p class="subtitle">أدخل الوظيفة التي تطمح إليها لنرسم لك مساراً استراتيجياً من 30 خطوة عملية للوصول إلى
+                    هدفك.</p>
+
+                <div class="input-wrapper">
+                    <input type="text" id="targetJob" placeholder="مثلاً: مدير مشروع، مسؤول حماية، خبير مالي..."
+                        class="premium-input" oninput="handleAutoTrigger(this)">
+                    <div id="aiPulse" class="ai-pulse" style="display: none;">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loader" class="premium-loader" style="display: none;">
+                <div class="loader-spinner"></div>
+                <h3 id="loaderText">جاري هندسة 30 خطوة استراتيجية لمستقبلك...</h3>
+                <div class="loader-bar">
+                    <div class="loader-progress"></div>
+                </div>
+            </div>
+
+            <div id="resultArea" style="display: none;" class="anim-slide-up">
+                <div class="glass-card result-card">
+                    <div id="analysisSection" class="premium-banner">
+                        <div class="banner-icon"><i class="fas fa-chart-pie"></i></div>
+                        <div class="banner-content">
+                            <h3>التحليل الاستراتيجي للفجوة المهنية</h3>
+                            <p id="analysisText"></p>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title"><i class="fas fa-map-marked-alt"></i> خطوات المسار الموصى بها (30 خطوة):
+                    </h3>
+                    <div id="stepsContainer" class="steps-grid"></div>
+
+                    <button onclick="ProtectionManager.verify(() => window.print())" class="btn btn-primary"
+                        style="width: 100%; margin-top: 50px; justify-content: center; height: 60px; border-radius: 20px;">
+                        <i class="fas fa-file-pdf"></i> تصدير خارطة الطريق المهنية
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">أثر</div>
+            <div class="footer-credit">تطوير وتنفيذ أ. نبيل الحميد &copy; 2025</div>
+        </div>
+    </footer>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #10b981;
+            --bg-body: #f1f5f9;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+        }
+
+        .premium-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            padding: 45px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+        }
+
+        .main-input-card {
+            text-align: center;
+            border-top: 8px solid var(--primary);
+        }
+
+        .card-header-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-weight: 900;
+            font-size: 2.5rem;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 22px 30px;
+            border-radius: 20px;
+            border: 2px solid var(--glass-border);
+            background: white;
+            font-size: 1.25rem;
+            font-family: 'Cairo';
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .premium-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px var(--primary-glow);
+            outline: none;
+        }
+
+        .premium-banner {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: white;
+            padding: 35px;
+            border-radius: 25px;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .banner-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .banner-content h3 {
+            margin: 0 0 10px 0;
+            font-weight: 900;
+            font-size: 1.4rem;
+        }
+
+        .banner-content p {
+            margin: 0;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .section-title {
+            font-weight: 900;
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 20px;
+            padding: 25px;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+            border-right: 6px solid var(--primary);
+        }
+
+        .step-card:hover {
+            transform: translateX(-10px);
+            border-color: var(--primary);
+        }
+
+        .step-num {
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 1.5rem;
+            min-width: 40px;
+            font-family: 'Outfit';
+        }
+
+        .step-title {
+            font-weight: 800;
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .premium-loader {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--glass-border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ai-pulse {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+        }
+
+        .ai-pulse span {
+            width: 4px;
+            height: 16px;
+            background: var(--primary);
+            animation: ai-pulse 0.8s infinite ease-in-out;
+        }
+    </style>
+
+    <script src="js/modules/file_processor.js"></script>
+    <script>
+        let timeout = null;
+        const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbzSdWq5xiGZQZ9-DuaVh57f_3UKLuuYWukgIC3x2vtvt5d2VIyEv4yiJn93-hIrgLL9/exec";
+        let uploadedText = "";
+
+        // Add styles dynamically for upload button
+        const style = document.createElement('style');
+        style.textContent = `
+            .premium-input { padding-left: 60px; } 
+            .file-upload-btn {
+                position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+                background: var(--primary); color: white; width: 40px; height: 40px;
+                border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                cursor: pointer; transition: 0.3s; z-index: 10; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+            }
+            .file-upload-btn:hover { transform: translateY(-50%) scale(1.1); background: #4f46e5; }
+        `;
+        document.head.appendChild(style);
+
+        // Inject HTML for file input using JS to avoid large range replacements
+        const wrapper = document.querySelector('.input-wrapper');
+        if (wrapper && !wrapper.querySelector('.file-upload-btn')) {
+            const label = document.createElement('label');
+            label.className = 'file-upload-btn';
+            label.htmlFor = 'fileUpload';
+            label.title = 'ارفع سيرتك الذاتية (PDF/DOCX) لتحليل أدق';
+            label.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+            wrapper.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'fileUpload';
+            input.accept = '.pdf,.docx,.doc,.txt';
+            input.style.display = 'none';
+            input.onchange = function () { handleFileUpload(this); };
+            wrapper.appendChild(input);
+
+            // Adjust placeholder
+            document.getElementById('targetJob').placeholder = "أدخل وظيفة الحلم، أو ارفع سيرتك الذاتية...";
+        }
+
+        function handleAutoTrigger(input) {
+            clearTimeout(timeout);
+            const val = input.value.trim();
+            const pulse = document.getElementById('aiPulse');
+            if (val.length < 5 && !uploadedText) { pulse.style.display = 'none'; return; }
+            pulse.style.display = 'flex';
+            timeout = setTimeout(() => { startCareerDesign(val); }, 1800);
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('loader');
+            const loaderText = document.getElementById('loaderText');
+
+            loader.style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            loaderText.innerText = `جاري قراءة الملف وتحليل المسار: ${file.name}...`;
+
+            try {
+                if (typeof fileProcessor === 'undefined') console.warn("FileProcessor logic loading...");
+
+                const result = await fileProcessor.processFile(file, { extractText: true });
+                uploadedText = result.text;
+
+                loaderText.innerText = "تم استخراج البيانات، جاري رسم الخارطة...";
+                document.getElementById('targetJob').value = `ملف: ${file.name}`;
+
+                startCareerDesign(uploadedText);
+
+            } catch (e) {
+                console.error(e);
+                alert(`خطأ في الملف: ${e.message}`);
+                loader.style.display = 'none';
+            }
+        }
+
+        async function startCareerDesign(inputContent) {
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            const pulse = document.getElementById('aiPulse');
+            const context = uploadedText || inputContent;
+
+            if (!context || context.length < 3) return;
+
+            pulse.style.display = 'none';
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            window.scrollTo({ top: loader.offsetTop - 100, behavior: 'smooth' });
+
+            const prompt = PromptBuilder.buildUnifiedPrompt('مسار', context, {
+                itemCount: 30,
+                fileContent: uploadedText ? uploadedText : ''
+            });
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}?action=ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: "You are a career strategist that returns ONLY valid JSON in Arabic." },
+                            { role: "user", content: prompt }
+                        ]
+                    })
+                });
+
+                const bridgeRes = await res.json();
+                if (bridgeRes.status === "error") throw new Error(bridgeRes.message);
+
+                const aiResponse = bridgeRes.data;
+                const cleanJson = aiResponse.replace(/```json\s*|```\s*/gi, "").trim();
+                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+
+                if (!jsonMatch) throw new Error("JSON_ERROR");
+                const data = JSON.parse(jsonMatch[0]);
+                if (data.error) throw new Error(data.error.message || "AI_ERROR");
+
+                document.getElementById('analysisText').innerText = data.analysis || "تحليل المسار المهني...";
+
+                const container = document.getElementById('stepsContainer');
+                const steps = data.items || data.steps || data.path || [];
+                container.innerHTML = steps.map((s, idx) => `
+                    <div class="step-card anim-slide-up" style="animation-delay: ${idx * 0.05}s">
+                        <span class="step-num">${idx + 1}</span>
+                        <div>
+                            <span class="step-title">${s.q || s.title}</span>
+                            <div class="step-desc">${s.a || s.desc || s.description}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                resultArea.style.display = 'block';
+                window.scrollTo({ top: resultArea.offsetTop - 50, behavior: 'smooth' });
+
+            } catch (e) {
+                console.error(e);
+                alert(`تعذر رسم خارطة الطريق حالياً.\n\nالتفاصيل: ${e.message}`);
+            } finally { loader.style.display = 'none'; }
+        }
+    </script>
+</body>
+
+</html>
