@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | الاستعداد الميداني الذكي</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Outfit:wght@300;600;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 950px; padding-bottom: 100px;">
+        <nav class="premium-nav">
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثـــــر</div>
+                    <div class="logo-slogan">جاهزية ميدانية مطلقة</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost"><i class="fas fa-home"></i> الرئيسية</a>
+            </div>
+        </nav>
+
+        <main class="anim-fade-in" style="margin-top: 50px;">
+            <div class="glass-card main-input-card" style="border-top-color: var(--accent);">
+                <div class="card-header-icon" style="color: var(--accent);">
+                    <i class="fas fa-helicopter"></i>
+                </div>
+                <h1>دليل الجاهزية الميدانية</h1>
+                <p class="subtitle">أدخل طبيعة مهمتك الميدانية لنقوم ببناء 30 نصيحة تقنية وخطة عمل ميدانية شاملة لضمان
+                    الكفاءة والسلامة.</p>
+
+                <div class="input-wrapper">
+                    <input type="text" id="fieldMission"
+                        placeholder="مثلاً: توزيع مساعدات، مسح ميداني، تقييم احتياجات..." class="premium-input"
+                        oninput="handleAutoTrigger(this)">
+                    <div id="aiPulse" class="ai-pulse" style="display: none;">
+                        <span style="background: var(--accent);"></span>
+                        <span style="background: var(--accent);"></span>
+                        <span style="background: var(--accent);"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loader" class="premium-loader" style="display: none;">
+                <div class="loader-spinner" style="border-top-color: var(--accent);"></div>
+                <h3>جاري إعداد 30 استراتيجية ميدانية دقيقة...</h3>
+                <div class="loader-bar">
+                    <div class="loader-progress" style="background: var(--accent);"></div>
+                </div>
+            </div>
+
+            <div id="resultArea" style="display: none;" class="anim-slide-up">
+                <div class="glass-card result-card">
+                    <div class="wisdom-section"
+                        style="background: rgba(16, 185, 129, 0.05); border-color: var(--accent); margin-top: 0; margin-bottom: 40px;">
+                        <div class="wisdom-header" style="color: var(--accent);">
+                            <i class="fas fa-toolbox"></i>
+                            <h3>أدوات وتقنيات موصى بها للمهمة</h3>
+                        </div>
+                        <p id="toolsText" style="line-height: 1.8; font-weight: 700; color: var(--text-main);"></p>
+                    </div>
+
+                    <h3 class="section-title" style="color: var(--accent);"><i class="fas fa-clipboard-list"></i>
+                        البروتوكول الميداني (30 نقطة):</h3>
+                    <div id="fieldContent" class="steps-grid"></div>
+
+                    <button onclick="ProtectionManager.verify(() => window.print())" class="btn btn-primary"
+                        style="width: 100%; margin-top: 50px; justify-content: center; background: var(--accent); border-color: var(--accent); height: 60px;">
+                        <i class="fas fa-file-pdf"></i> تصدير دليل المهمة
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">أثر</div>
+            <div class="footer-credit">تطوير وتنفيذ أ. نبيل الحميد &copy; 2025</div>
+        </div>
+    </footer>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #10b981;
+            --bg-body: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+        }
+
+        .premium-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            padding: 50px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+        }
+
+        .main-input-card {
+            text-align: center;
+            border-top: 8px solid var(--accent);
+        }
+
+        .card-header-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-weight: 950;
+            font-size: 2.6rem;
+            letter-spacing: -1px;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 25px 35px;
+            border-radius: 20px;
+            border: 2px solid var(--glass-border);
+            background: white;
+            font-size: 1.3rem;
+            font-family: 'Cairo';
+            text-align: center;
+            transition: 0.4s;
+        }
+
+        .premium-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15);
+            outline: none;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 22px;
+            padding: 28px;
+            background: white;
+            border-radius: 22px;
+            border: 1px solid var(--glass-border);
+            border-right: 6px solid var(--accent);
+            transition: 0.3s;
+        }
+
+        .step-num {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 1.6rem;
+            font-family: 'Outfit';
+            min-width: 45px;
+        }
+
+        .step-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .premium-loader {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .loader-spinner {
+            width: 70px;
+            height: 70px;
+            border: 6px solid var(--glass-border);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ai-pulse {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+
+        .ai-pulse span {
+            width: 5px;
+            height: 18px;
+            animation: ai-pulse 0.8s infinite ease-in-out;
+        }
+
+        @keyframes ai-pulse {
+
+            0%,
+            100% {
+                transform: scaleY(0.4);
+            }
+
+            50% {
+                transform: scaleY(1.4);
+            }
+        }
+    </style>
+
+    <script src="js/modules/file_processor.js"></script>
+    <script>
+        let timeout = null;
+        const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbzSdWq5xiGZQZ9-DuaVh57f_3UKLuuYWukgIC3x2vtvt5d2VIyEv4yiJn93-hIrgLL9/exec";
+        let uploadedText = "";
+
+        // Add styles dynamically for upload button - kept consistent
+        const style = document.createElement('style');
+        style.textContent = `
+            .premium-input { padding-left: 60px; } 
+            .file-upload-btn {
+                position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+                background: var(--accent); color: white; width: 40px; height: 40px;
+                border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                cursor: pointer; transition: 0.3s; z-index: 10; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+            }
+            .file-upload-btn:hover { transform: translateY(-50%) scale(1.1); background: #059669; }
+        `;
+        document.head.appendChild(style);
+
+        // Inject HTML for file input
+        const wrapper = document.querySelector('.input-wrapper');
+        const aiPulse = document.getElementById('aiPulse'); // Get existing pulse element
+        if (wrapper && !wrapper.querySelector('.file-upload-btn')) {
+            const label = document.createElement('label');
+            label.className = 'file-upload-btn';
+            label.htmlFor = 'fileUpload';
+            label.title = 'ارفع وثائق المهمة (ToR/Plan/PDF)';
+            label.innerHTML = '<i class="fas fa-file-medical-alt"></i>';
+            wrapper.insertBefore(label, aiPulse); // Insert before pulse to maintain layout
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'fileUpload';
+            input.accept = '.pdf,.docx,.doc,.txt';
+            input.style.display = 'none';
+            input.onchange = function () { handleFileUpload(this); };
+            wrapper.appendChild(input);
+
+            // Adjust placeholder
+            document.getElementById('fieldMission').placeholder = "أدخل طبيعة المهمة، أو ارفع ملف التكليف...";
+        }
+
+        function handleAutoTrigger(input) {
+            clearTimeout(timeout);
+            const val = input.value.trim();
+            const pulse = document.getElementById('aiPulse');
+            if (val.length < 5 && !uploadedText) { pulse.style.display = 'none'; return; }
+            pulse.style.display = 'flex';
+            timeout = setTimeout(() => { startFieldPlanning(val); }, 1800);
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            // Check if h3 exists inside loader, if not use a fallback logic (the HTML has <h3> inside loader)
+            const loaderH3 = loader.querySelector('h3');
+
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+            if (loaderH3) loaderH3.innerText = `جاري تحليل وثائق المهمة: ${file.name}...`;
+
+            try {
+                if (typeof fileProcessor === 'undefined') console.warn("FileProcessor logic loading...");
+
+                const result = await fileProcessor.processFile(file, { extractText: true });
+                uploadedText = result.text;
+
+                if (loaderH3) loaderH3.innerText = "تم استيعاب المهمة، جاري بناء الاستراتيجية...";
+                document.getElementById('fieldMission').value = `ملف: ${file.name}`;
+
+                startFieldPlanning(uploadedText);
+
+            } catch (e) {
+                console.error(e);
+                alert(`خطأ في الملف: ${e.message}`);
+                loader.style.display = 'none';
+            }
+        }
+
+        async function startFieldPlanning(inputContent) {
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            const pulse = document.getElementById('aiPulse');
+            const context = uploadedText || inputContent;
+
+            if (!context || context.length < 3) return;
+
+            pulse.style.display = 'none';
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            const prompt = PromptBuilder.buildUnifiedPrompt('جاهزية', context, {
+                itemCount: 30,
+                fileContent: uploadedText ? uploadedText : ''
+            });
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}?action=ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: "You are a humanitarian field expert that returns ONLY valid JSON in Arabic." },
+                            { role: "user", content: prompt }
+                        ]
+                    })
+                });
+
+                const bridgeRes = await res.json();
+                if (bridgeRes.status === "error") throw new Error(bridgeRes.message);
+
+                const aiResponse = bridgeRes.data;
+                const cleanJson = aiResponse.replace(/```json\s*|```\s*/gi, "").trim();
+                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+
+                if (!jsonMatch) throw new Error("JSON_ERROR");
+                const data = JSON.parse(jsonMatch[0]);
+                if (data.error) throw new Error(data.error.message || "AI_ERROR");
+
+                document.getElementById('toolsText').innerText = (data.tools || data.skills || []).join(' • ');
+
+                const container = document.getElementById('fieldContent');
+                const list = data.strategies || data.points || [];
+                container.innerHTML = list.map((s, idx) => `
+                    <div class="step-card anim-slide-up" style="animation-delay: ${idx * 0.05}s">
+                        <span class="step-num">${idx + 1}</span>
+                        <div>
+                            <span class="step-title">${s.title}</span>
+                            <div class="step-desc">${s.desc || s.description}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                resultArea.style.display = 'block';
+                window.scrollTo({ top: resultArea.offsetTop - 50, behavior: 'smooth' });
+
+            } catch (e) {
+                console.error(e);
+                alert(`تعذر بناء الدليل الميداني حالياً.\n\nالتفاصيل: ${e.message}`);
+            } finally { loader.style.display = 'none'; }
+        }
+    </script>
+</body>
+
+</html>
