@@ -1,0 +1,28 @@
+const CACHE_NAME = 'athar-cache-v2';
+const urlsToCache = [
+    '/',
+    'index.html',
+    'ops_dashboard.html',
+    'org_services.html',
+    'library_v3.html',
+    'cv_improved.html',
+    'style.css',
+    'language_manager.js',
+    'js/global_settings.js',
+    'protection.js',
+    'تنزيل.jpg'
+];
+
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(urlsToCache))
+    );
+});
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => response || fetch(event.request))
+    );
+});
