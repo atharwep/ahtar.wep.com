@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | محرك التوظيف الذكي وATS</title>
+    <link rel="icon" type="image/x-icon" href="تنزيل.jpg">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Inter:wght@400;600;800&family=Cairo:wght@400;600;700;900&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="language_manager.js"></script>
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
+    <script src="js/config.js"></script>
+    <script src="js/modules/api_proxy.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+    <script src="js/modules/ats_engine.js"></script>
+    <style>
+        /* Force CV paper to be clean and start from top */
+        .cv-paper {
+            background: #f8fafc !important;
+            /* light grey background for the container */
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .cv-content-page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 24mm 20mm;
+            box-sizing: border-box;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            color: #1a202c;
+            line-height: 1.6;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        /* Premium Typography for AI Generated Content */
+        .cv-content-page h1 {
+            font-family: 'Poppins', 'Cairo', sans-serif;
+            font-weight: 800;
+            color: #1e293b;
+            font-size: 26pt;
+            text-align: center;
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .cv-content-page h2 {
+            font-family: 'Poppins', 'Cairo', sans-serif;
+            font-weight: 700;
+            color: #4f46e5;
+            font-size: 16pt;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cv-content-page h3 {
+            font-family: 'Poppins', 'Cairo', sans-serif;
+            font-weight: 600;
+            color: #334155;
+            font-size: 13pt;
+            margin-top: 22px;
+            margin-bottom: 12px;
+        }
+
+        .cv-content-page ul {
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+
+        .cv-content-page li {
+            margin-bottom: 12px;
+            color: #334155;
+            list-style-type: none;
+            position: relative;
+        }
+
+        .cv-content-page li::before {
+            content: "•";
+            color: #4f46e5;
+            font-weight: bold;
+            position: absolute;
+            right: -20px;
+            font-size: 1.4rem;
+            line-height: 1.2;
+        }
+
+        .cv-content-page[style*="direction: ltr"] li::before {
+            right: auto;
+            left: -20px;
+        }
+
+        .cv-content-page p {
+            margin-bottom: 16px;
+            color: #475569;
+            font-size: 11pt;
+            text-align: justify;
+        }
+
+        /* LTR adjustments for English version */
+        .cv-content-page[style*="direction: ltr"] {
+            font-family: 'Inter', 'Poppins', sans-serif !important;
+            text-align: left;
+        }
+
+        .cv-content-page[style*="direction: ltr"] ul {
+            padding-left: 25px;
+            padding-right: 0;
+        }
+
+        @page {
+            margin: 0;
+            size: auto;
+        }
+
+        @media print {
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .container {
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .glass-card {
+                border: none !important;
+                background: white !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .cv-paper {
+                background: white !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .cv-content-page {
+                box-shadow: none !important;
+                transform: none !important;
+                border: none !important;
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .ats-report-card {
+            background: #ffffff;
+            border-right: 6px solid #4f46e5;
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 99px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+        }
+
+        .lang-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .lang-tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            font-weight: 700;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .lang-tab:hover {
+            color: #1e293b;
+        }
+
+        .lang-tab.active {
+            background: white;
+            color: #4f46e5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Unified Form Styles */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.25rem;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .btn-mini {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+
+        .btn-mini:hover {
+            transform: scale(1.1);
+            background: #4338ca;
+        }
+
+        .btn-mini-text {
+            background: #f1f5f9;
+            color: #4f46e5;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .exp-item,
+        .edu-item,
+        .proj-item,
+        .train-item,
+        .lang-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #f1f5f9;
+        }
+
+        .exp-item:last-child {
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="protection.js"></script>
+    <div class="bg-blobs no-print">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <nav class="no-print">
+            <div class="logo-container">
+                <a href="index.html" style="text-decoration:none; display:flex; align-items:center; gap:20px;">
+                    <img src="تنزيل.jpg" alt="Logo" id="mainLogo">
+                    <div>
+                        <div class="logo">أثـــــر</div>
+                        <div class="logo-slogan">محرك التوظيف الذكي وATS</div>
+                    </div>
+                </a>
+            </div>
+            <a href="index.html" class="btn btn-ghost">🏠 الرئيسية</a>
+        </nav>
+
+        <main class="glass-card">
+            <h1 class="no-print">🚀 بناء سيرة ذاتية - محرك ATS الفائق</h1>
+            <p class="no-print" style="color: var(--text-secondary); margin-bottom: 30px;">
+                قم بإدخال بياناتك وربطها بإعلان الوظيفة لتحصل على سيرة ذاتية جاهزة للاختراق والقبول الفوري.
+                <br>
+                <a href="cv_improved.html"
+                    style="color: var(--primary); font-weight: bold; text-decoration: underline;">أو اضغط هنا لاستخدام
+                    القوالب الاحترافية الملونة 🎨</a>
+            </p>
+
+            <div class="manual-form no-print" id="cvForm">
+                <!-- 1. Personal Info -->
+                <div class="form-section">
+                    <h3 style="color: var(--primary);"><i class="fas fa-user"></i> المعلومات الشخصية</h3>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>الاسم الكامل</label>
+                            <input type="text" id="inpName" placeholder="الاسم الرباعي" class="input-glass">
+                        </div>
+                        <div class="form-group">
+                            <label>المسمى الوظيفي المستهدف</label>
+                            <input type="text" id="inpTitle" placeholder="Ex: Project Manager" class="input-glass">
+                        </div>
+                        <div class="form-group">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" id="inpEmail" placeholder="Example@mail.com" class="input-glass">
+                        </div>
+                        <div class="form-group">
+                            <label>رقم التواصل (WhatsApp)</label>
+                            <input type="text" id="inpPhone" placeholder="+967..." class="input-glass">
+                        </div>
+                        <div class="form-group">
+                            <label>الموقع (البلد - المدينة)</label>
+                            <input type="text" id="inpLocation" placeholder="Yemen, Sana'a" class="input-glass">
+                        </div>
+                        <div class="form-group">
+                            <label>روابط مهنية (LinkedIn, Portfolio)</label>
+                            <input type="text" id="inpLinks" placeholder="LinkedIn, Behance..." class="input-glass">
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 3. Experience -->
+                <div class="form-section">
+                    <h3 style="color: var(--primary);"><i class="fas fa-briefcase"></i> الخبرات العملية (الأحدث فالأقدم)
+                        <button class="btn-mini" onclick="addExpField()">+</button>
+                    </h3>
+                    <div id="expContainer">
+                        <div class="exp-item">
+                            <div class="grid-3">
+                                <input type="text" class="inp-exp-role" placeholder="المسمى الوظيفي">
+                                <input type="text" class="inp-exp-org" placeholder="المنظمة / الشركة">
+                                <input type="text" class="inp-exp-date" placeholder="المدة (مثال: 2020 - 2022)">
+                            </div>
+                            <div style="text-align:left; margin-bottom:5px;">
+                                <button class="btn-mini-text" onclick="generateExpDescription(this)">🤖 اقتراح
+                                    مهام</button>
+                            </div>
+                            <textarea class="inp-exp-desc" rows="8"
+                                placeholder="أهم المهام والمسؤوليات والإنجازات..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Education -->
+                <div class="form-section">
+                    <h3 style="color: var(--primary);"><i class="fas fa-graduation-cap"></i> المؤهلات العلمية
+                        <button class="btn-mini" onclick="addEduField()">+</button>
+                    </h3>
+                    <div id="eduContainer">
+                        <div class="edu-item grid-3">
+                            <input type="text" class="inp-edu-degree" placeholder="الدرجة العلمية">
+                            <input type="text" class="inp-edu-school" placeholder="الجامعة / المؤسسة">
+                            <input type="text" class="inp-edu-date" placeholder="سنة التخرج">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Skills -->
+                <div class="form-section">
+                    <h3
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <span><i class="fas fa-star"></i> المهارات</span>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn-mini-text" onclick="generateSoftSkills('smart')">🤖 مهارات ذكية</button>
+                            <button class="btn-mini-text" onclick="generateSoftSkills('custom')"
+                                style="background:#f8fafc; color:#64748b; border-color:#e2e8f0;">🎨 مخصص</button>
+                        </div>
+                    </h3>
+                    <div class="grid-1">
+                        <textarea id="inpSkillsPersonal" rows="8"
+                            placeholder="المهارات الشخصية والاحترافية (مرتبة 1-2-3)..." class="input-glass"
+                            style="resize: vertical;"></textarea>
+                    </div>
+                </div>
+
+                <!-- 6. Projects -->
+                <div class="form-section">
+                    <h3 style="color: var(--primary);"><i class="fas fa-project-diagram"></i> المشاريع والإنجازات
+                        <button class="btn-mini" onclick="addProjField()">+</button>
+                    </h3>
+                    <div id="projContainer">
+                        <div class="proj-item">
+                            <input type="text" class="inp-proj-name" placeholder="اسم المشروع / الإنجاز"
+                                style="margin-bottom:5px; width:100%;" class="input-glass">
+                            <textarea class="inp-proj-desc" rows="2" placeholder="وصف موجز للأثر والدور..."
+                                class="input-glass"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Training & Certs -->
+                <div class="form-section">
+                    <h3 style="color: var(--primary);"><i class="fas fa-certificate"></i> الشهادات والدورات
+                        <button class="btn-mini" onclick="addTrainField()">+</button>
+                    </h3>
+                    <div id="trainContainer">
+                        <div class="train-item grid-2">
+                            <input type="text" class="inp-train-course" placeholder="اسم الدورة / الشهادة">
+                            <input type="text" class="inp-train-org" placeholder="الجهة المانحة">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Languages -->
+                <div class="form-section">
+                    <h3 style="color: var(--primary);"><i class="fas fa-globe"></i> اللغات
+                        <button class="btn-mini" onclick="addLangField()">+</button>
+                    </h3>
+                    <div id="langContainer">
+                        <div class="lang-item grid-2">
+                            <input type="text" class="inp-lang-name" placeholder="اللغة">
+                            <select class="inp-lang-level" class="input-glass">
+                                <option value="Native">اللغة الأم</option>
+                                <option value="Excellent">ممتاز</option>
+                                <option value="Very Good">جيد جداً</option>
+                                <option value="Good">جيد</option>
+                                <option value="Beginner">مبتدئ</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATS Specific Section -->
+                <div class="form-section"
+                    style="background: rgba(79, 70, 229, 0.05); padding: 25px; border-radius: 20px; border: 1px dashed var(--primary);">
+                    <h3 style="color: var(--primary); margin-top: 0;"><i class="fas fa-bullseye"></i> استهداف الوظيفة
+                        الكرتوني (ATS Optimization)</h3>
+                    <label style="display: block; margin-bottom: 15px; font-weight: bold;">📄 ملف إعلان الوظيفة (PDF /
+                        DOCX)</label>
+                    <input type="file" id="jobFile" accept=".docx,.pdf" style="margin-bottom: 15px; width: 100%;"
+                        class="input-glass">
+                    <textarea id="jobAdText" rows="4" class="input-glass"
+                        placeholder="أو الصق نص الإعلان هنا مباشرة لتحليل الكلمات المفتاحية وضبط السيرة ذاتية وفقاً للمتطلبات..."></textarea>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button id="generateCVBtn" class="btn btn-primary"
+                        style="width: 100%; font-size: 1.3rem; padding: 20px;">
+                        توليد السيرة الذاتية واختراق ATS ⚡
+                    </button>
+                </div>
+            </div>
+
+            <div id="cvResult"
+                style="display: none; margin-top: 40px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
+                <div class="lang-tabs no-print">
+                    <div class="lang-tab active" onclick="switchLang('en')">English Version 🇺🇸</div>
+                    <div class="lang-tab" onclick="switchLang('ar')">النسخة العربية 🇸🇦</div>
+                </div>
+
+                <div id="cvPreview" class="cv-paper">
+                    <div id="cvEN" class="cv-content-page" style="direction: ltr; text-align: left;"></div>
+                    <div id="cvAR" class="cv-content-page" style="direction: rtl; text-align: right; display: none;">
+                    </div>
+                </div>
+
+                <div class="ats-report-card no-print">
+                    <h3>📊 تقرير توافق ATS</h3>
+                    <div id="atsScore" class="score-pill">0%</div>
+                    <div id="atsReport" style="line-height: 1.6;"></div>
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap;"
+                    class="no-print">
+                    <button id="downloadPdfBtn" class="btn btn-primary" style="background: #10b981;">تحميل PDF (النسخة
+                        الإنجليزية) 📥</button>
+                    <button id="downloadPdfArBtn" class="btn btn-primary" style="background: #4f46e5;">تحميل PDF (النسخة
+                        العربية) 📥</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let generatedData = null;
+
+        // File reading
+        async function readJobFile(file) {
+            const area = document.getElementById('jobAdText');
+            area.value = "⏳ جاري استخراج نص الإعلان...";
+            try {
+                if (file.name.endsWith('.pdf')) {
+                    const doc = await pdfjsLib.getDocument(await file.arrayBuffer()).promise;
+                    let text = "";
+                    for (let i = 1; i <= doc.numPages; i++) {
+                        const pg = await doc.getPage(i);
+                        const content = await pg.getTextContent();
+                        text += content.items.map(s => s.str).join(" ") + "\n";
+                    }
+                    area.value = text;
+                } else {
+                    const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+                    area.value = res.value;
+                }
+            } catch (e) {
+                area.value = "❌ خطأ في القراءة";
+            }
+        }
+        document.getElementById('jobFile').onchange = (e) => readJobFile(e.target.files[0]);
+
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+            const tabs = document.querySelectorAll('.lang-tab');
+            if (lang === 'en') {
+                tabs[0].classList.add('active');
+                document.getElementById('cvEN').style.display = 'block';
+                document.getElementById('cvAR').style.display = 'none';
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('cvEN').style.display = 'none';
+                document.getElementById('cvAR').style.display = 'block';
+            }
+        }
+
+        // --- Dynamic Fields Helpers ---
+        window.addEduField = () => {
+            const div = document.createElement('div');
+            div.className = 'edu-item grid-3';
+            div.innerHTML = `
+                <input type="text" class="inp-edu-degree" placeholder="الدرجة العلمية">
+                <input type="text" class="inp-edu-school" placeholder="الجامعة / المؤسسة">
+                <input type="text" class="inp-edu-date" placeholder="سنة التخرج">
+            `;
+            document.getElementById('eduContainer').appendChild(div);
+        };
+
+        window.addExpField = () => {
+            const div = document.createElement('div');
+            div.className = 'exp-item';
+            div.innerHTML = `
+                <div class="grid-3" style="margin-top:10px;">
+                    <input type="text" class="inp-exp-role" placeholder="المسمى الوظيفي">
+                    <input type="text" class="inp-exp-org" placeholder="المنظمة / الشركة">
+                    <input type="text" class="inp-exp-date" placeholder="المدة">
+                </div>
+                <div style="text-align:left; margin-bottom:5px;">
+                    <button class="btn-mini-text" onclick="generateExpDescription(this)">🤖 اقتراح مهام</button>
+                </div>
+                <textarea class="inp-exp-desc" rows="8" placeholder="أهم المهام والمسؤوليات..."></textarea>
+            `;
+            document.getElementById('expContainer').appendChild(div);
+        };
+
+        window.addProjField = () => {
+            const div = document.createElement('div');
+            div.className = 'proj-item';
+            div.innerHTML = `
+                <input type="text" class="inp-proj-name" placeholder="اسم المشروع / الإنجاز" style="margin-top:10px; width:100%;" class="input-glass">
+                <textarea class="inp-proj-desc" rows="2" placeholder="وصف موجز للأثر والدور..." class="input-glass"></textarea>
+            `;
+            document.getElementById('projContainer').appendChild(div);
+        };
+
+        window.addTrainField = () => {
+            const div = document.createElement('div');
+            div.className = 'train-item grid-2';
+            div.innerHTML = `
+                <input type="text" class="inp-train-course" placeholder="اسم الدورة / التدريب" style="margin-top:10px;">
+                <input type="text" class="inp-train-org" placeholder="الجهة المنظمة" style="margin-top:10px;">
+            `;
+            document.getElementById('trainContainer').appendChild(div);
+        };
+
+        window.addLangField = () => {
+            const div = document.createElement('div');
+            div.className = 'lang-item grid-2';
+            div.innerHTML = `
+                <input type="text" class="inp-lang-name" placeholder="اللغة" style="margin-top:10px;">
+                <select class="inp-lang-level" style="margin-top:10px;">
+                    <option value="Native">اللغة الأم</option>
+                    <option value="Excellent">ممتاز</option>
+                    <option value="Very Good">جيد جداً</option>
+                    <option value="Good">جيد</option>
+                    <option value="Beginner">مبتدئ</option>
+                </select>
+            `;
+            document.getElementById('langContainer').appendChild(div);
+        };
+
+        window.generateSoftSkills = async (type = 'smart') => {
+            const btn = event.target;
+            const title = document.getElementById('inpTitle').value;
+            if (!title) return alert("يرجى كتابة المسمى الوظيفي أولاً");
+            btn.innerText = "⏳ جاري...";
+            btn.disabled = true;
+
+            let prompt = "";
+            if (type === 'smart') {
+                prompt = `أنت محرك ذكاء اصطناعي مهني لمنصة "أثر". المطلوب: تقديم المهارات الثابتة التالية نصياً وبدقة كقائمة مرقمة (1-22) مع ترك سطر فارغ بين كل مهارة.
+                القواعد: لا تستخدم رموزاً أو إيموجي، الزم الدقة المهنية 100%، أرجع النص فقط.
+                المهارات:
+                1. خبرة العمل في برامج Office.
+                2. خبرة متميزة في التخطيط والتنفيذ الميداني.
+                3. خبرة في الرصد والتقييم والمتابعة.
+                4. القدرة على التنقل والعمل في البيئات الصعبة والمتقلبة.
+                5. مهارات استخدام الأدوات والبرامج التقنية المتخصصة.
+                6. القدرة على العمل ضمن فريق مدمج وتعزيز روح التعاون.
+                7. القدرة على تحليل المشكلات وإيجاد حلول إبداعية وفعالة.
+                8. القدرة على العمل باستقلالية وتحمل ضغوط العمل المستمرة.
+                9. مهارات تواصل خطية وشفوية ممتازة باللغة العربية.
+                10. قابلية عالية للتعلم المستمر واكتساب مهارات جديدة.
+                11. مهارات العمل في سياقات معقدة وطارئة.
+                12. فهم المخاوف الأخلاقية المتعلقة بالخصوصية وإدارة المعلومات.
+                13. فهم المخاطر وفرص الفضاء الافتراضي والإنترنت.
+                14. خبرة في هيكلة المنظمات والممارسات وإجراءاتها الإدارية.
+                15. خبرة ممتازة في المعايير الإنسانية والالتزام بها.
+                16. مهارات التعامل في بيئة غير آمنة والالتزام ببروتوكولات السلامة.
+                17. خبرة في مجال التمكين المجتمعي وبناء الثقة.
+                18. المساهمة في تطوير وتعزيز المدخلات التقنية لضمان سير التنفيذ.
+                19. القدرة على توجيه فريق العمل لإتمام إنجاز المهام المطلوبة بكفاءة.
+                20. القدرة على البحث والاستطلاع واستقصاء المعلومات حول سير الأنشطة.
+                21. الاحتراف في مهارات الاتصال والتواصل الفعال مع مختلف الفئات.
+                22. القدرة على التعامل مع أشخاص من خلفيات ثقافية واجتماعية متنوعة.`;
+            } else {
+                prompt = `أنت محرك ذكاء اصطناعي مهني متخصص (Remedial CV Engine). المسمى الوظيفي: ${title}.
+                المطلوب: توليد قائمة مهارات "مخصصة" مرقمة (1-10) بناءً على متطلبات المنظمات الدولية (UN, NGOs). 
+                قواعد الصياغة:
+                - ابدأ الجمل بكلمات مثل (خبرة في...، القدرة على...، مهارات...، الاحتراف في...).
+                - التنسيق: قائمة مرقمة (1. ، 2. ، 3. ) مع ترك سطر فارغ.
+                - أرجع النتيجة كنص فقط (Plain Text) بدون إيموجي أو رموز أو JSON.`;
+            }
+
+            try {
+                const res = await apiProxy.callAI(prompt, { model: "llama-3.3-70b-versatile", temperature: 0.3 });
+                if (res) {
+                    let textContent = "";
+                    if (typeof res === 'string') {
+                        textContent = res;
+                    } else {
+                        const list = res.skills || res.items || res.personal || Object.values(res).find(v => Array.isArray(v));
+                        if (Array.isArray(list)) {
+                            textContent = list.map((item, idx) => {
+                                let val = typeof item === 'string' ? item : (item.q || item.text || item.skill || JSON.stringify(item));
+                                return `${idx + 1}. ${val}`;
+                            }).join('\n\n');
+                        } else {
+                            textContent = typeof res === 'object' ? JSON.stringify(res) : String(res);
+                        }
+                    }
+                    document.getElementById('inpSkillsPersonal').value = textContent.replace(/\\n/g, '\n').trim();
+                }
+            } catch (e) {
+                console.error("Soft Skills Generation Error:", e);
+            }
+            btn.innerText = type === 'smart' ? "🤖 مهارات ذكية" : "🎨 مخصص";
+            btn.disabled = false;
+        };
+
+        window.generateExpDescription = async (btn) => {
+            const parent = btn.closest('.exp-item');
+            const role = parent.querySelector('.inp-exp-role').value;
+            const org = parent.querySelector('.inp-exp-org').value;
+
+            if (!role) return alert("يرجى كتابة المسمى الوظيفي أولاً");
+
+            btn.innerText = "⏳ جاري...";
+            btn.disabled = true;
+
+            const prompt = `أنت محرك ذكاء اصطناعي مهني متخصص في تحليل السير الذاتية لمنصة "أثر".
+            المطلوب: توليد المهام والمسؤوليات للمسمى الوظيفي: "${role}" ${org ? `في منظمة: "${org}"` : ''}.
+            
+            قواعد صارمة (Remedial Standards):
+            1. المسمى الوظيفي هو المرجع الوحيد؛ لا تولد مهام عامة.
+            2. محاكاة البحث في توصيفات المنظمات الدولية (UN, NGOs, INGOs).
+            3. التنسيق: أرجع النتيجة كنص فقط (Plain Text) بصيغة فقرات مرقمة (1. ، 2. ، 3. ) مع ترك سطر فارغ بين كل فقرة وأخرى.
+            4. العدد: توليد (5 مهام احترافية فقط).
+            5. اللغة: الالتزام التام باللغة العربية الفصحى؛ يمنع منعاً باتاً دمج كلمات من لغات أخرى أو اختصارات مشوهة.
+            6. كل مهمة تبدأ بفعل مهني متميز وتعكس ممارسة واقعية ميدانية.
+            7. يُمنع استخدام أي رموز، إيموجي، JSON، أو نصوص مقدمة/خاتمة.`;
+
+            try {
+                const res = await apiProxy.callAI(prompt, { model: "llama-3.3-70b-versatile", temperature: 0.3 });
+                if (res) {
+                    let textContent = "";
+                    if (typeof res === 'string') {
+                        textContent = res;
+                    } else if (Array.isArray(res)) {
+                        textContent = res.map(i => typeof i === 'string' ? i : Object.values(i)[0]).join('\n\n');
+                    } else {
+                        const list = res.responsibilities || res.tasks || res.items || res['مهام ومسؤوليات'] || Object.values(res).find(v => Array.isArray(v));
+                        if (Array.isArray(list)) {
+                            textContent = list.map(i => typeof i === 'string' ? i : Object.values(i)[0]).join('\n\n');
+                        } else {
+                            textContent = typeof res === 'object' ? JSON.stringify(res) : String(res);
+                        }
+                    }
+                    parent.querySelector('.inp-exp-desc').value = textContent.replace(/\\n/g, '\n').trim();
+                }
+            } catch (e) {
+                console.error("Exp Description Generation Error:", e);
+                alert("تعذر جلب المهام حالياً، يرجى المحاولة مرة أخرى.");
+            }
+            btn.innerText = "🤖 اقتراح مهام ذكي";
+            btn.disabled = false;
+        };
+
+        document.getElementById('generateCVBtn').onclick = async () => {
+            const btn = document.getElementById('generateCVBtn');
+            const data = {
+                name: document.getElementById('inpName').value,
+                job: document.getElementById('inpTitle').value,
+                email: document.getElementById('inpEmail').value,
+                phone: document.getElementById('inpPhone').value,
+                loc: document.getElementById('inpLocation').value,
+                links: document.getElementById('inpLinks').value,
+                skillsPersonal: document.getElementById('inpSkillsPersonal').value,
+                experience: Array.from(document.querySelectorAll('.exp-item')).map(d => ({
+                    role: d.querySelector('.inp-exp-role').value,
+                    org: d.querySelector('.inp-exp-org').value,
+                    date: d.querySelector('.inp-exp-date').value,
+                    desc: d.querySelector('.inp-exp-desc').value
+                })),
+                education: Array.from(document.querySelectorAll('.edu-item')).map(d => ({
+                    degree: d.querySelector('.inp-edu-degree').value,
+                    school: d.querySelector('.inp-edu-school').value,
+                    date: d.querySelector('.inp-edu-date').value
+                })),
+                projects: Array.from(document.querySelectorAll('.proj-item')).map(d => ({
+                    name: d.querySelector('.inp-proj-name').value,
+                    desc: d.querySelector('.inp-proj-desc').value
+                })),
+                training: Array.from(document.querySelectorAll('.train-item')).map(d => ({
+                    course: d.querySelector('.inp-train-course').value,
+                    org: d.querySelector('.inp-train-org').value
+                })),
+                languages: Array.from(document.querySelectorAll('.lang-item')).map(d => ({
+                    name: d.querySelector('.inp-lang-name').value,
+                    level: d.querySelector('.inp-lang-level').value
+                })),
+                jobAd: document.getElementById('jobAdText').value
+            };
+
+            if (!data.job) return alert("يرجى ملء المسمى الوظيفي على الأقل.");
+
+            btn.disabled = true;
+            btn.innerText = "جاري بناء السيرة الذاتية وتحليل ATS... ⏳";
+
+            const prompt = PromptBuilder.buildCVMasterPrompt(data, {
+                jobAd: data.jobAd,
+                isBilingual: true
+            });
+
+            try {
+                const result = await apiProxy.callAI(prompt, {
+                    temperature: 0.3,
+                    model: "llama-3.3-70b-versatile"
+                });
+
+                if (!result) throw new Error("فشل في استخراج البيانات من الرد الرقمي.");
+                console.log("AI Result RECEIVED Object:", result);
+
+                // Robust extraction across formats
+                let aiText = "";
+                if (typeof result === 'string') {
+                    aiText = result;
+                } else if (result) {
+                    aiText = result.result || result.data || result.content || result.text || JSON.stringify(result);
+                }
+
+                let cleanResult = typeof aiText === 'string' ? apiProxy.extractJSON(aiText) : aiText;
+
+                if (!cleanResult) {
+                    console.error("FAILED TO PARSE JSON. RAW:", aiText);
+                    const snippet = typeof aiText === 'string' ? aiText.substring(0, 100) : "رد غير نصي";
+                    throw new Error(`فشل في تحليل بيانات السيرة الذاتية. الرد فارغ أو غير صالح.\n\nبداية الرد:\n"${snippet}..."`);
+                }
+
+                // Normalization for alternate field names
+                if (!cleanResult.cv_en) cleanResult.cv_en = cleanResult.en || cleanResult.english || cleanResult.CV_EN;
+                if (!cleanResult.cv_ar) cleanResult.cv_ar = cleanResult.ar || cleanResult.arabic || cleanResult.CV_AR;
+
+                if (!cleanResult.cv_en && !cleanResult.cv_ar) {
+                    console.error("Missing required CV sections. Structure received:", Object.keys(cleanResult));
+                    throw new Error("لم يحتوي الرد على الحقول المطلوبة (السيرة الذاتية بالإنجليزية أو العربية).");
+                }
+
+                generatedData = cleanResult;
+
+                const renderSafeHTML = (content) => {
+                    if (typeof content === 'string') return content;
+                    if (Array.isArray(content)) return content.join('<br>');
+                    if (typeof content === 'object' && content !== null) {
+                        return Object.values(content).map(v => typeof v === 'string' ? v : JSON.stringify(v)).join('<br>');
+                    }
+                    return '';
+                };
+
+                document.getElementById('cvEN').innerHTML = renderSafeHTML(cleanResult.cv_en || cleanResult.content_en);
+                document.getElementById('cvAR').innerHTML = renderSafeHTML(cleanResult.cv_ar || cleanResult.content_ar);
+
+                // ⚡ Real ATS Analysis using local engine
+                const cvText = (cleanResult.cv_en || '').replace(/<[^>]*>/g, ' ');
+                const analysis = await atsEngine.analyzeCVAsync(cvText, data.jobAd || data.job);
+
+                document.getElementById('atsScore').innerText = analysis.score + '%';
+
+                let reportHTML = `<ul>`;
+                analysis.suggestions.forEach(s => {
+                    reportHTML += `<li><strong>[${s.priority}]</strong>: ${s.text}</li>`;
+                });
+                reportHTML += `</ul>`;
+
+                if (analysis.strengths.length > 0) {
+                    reportHTML += `<div style="margin-top:10px; color:#10b981;">✅ نقاط القوة: ${analysis.strengths.join('، ')}</div>`;
+                }
+
+                document.getElementById('atsReport').innerHTML = reportHTML;
+                document.getElementById('cvResult').style.display = 'block';
+                window.scrollTo({ top: document.getElementById('cvResult').offsetTop, behavior: 'smooth' });
+            } catch (e) {
+                alert("خطأ في الاتصال بالنظام الرقمي: " + e.message);
+                console.error(e);
+            }
+
+            btn.disabled = false;
+            btn.innerText = "توليد السيرة الذاتية واختراق ATS ⚡";
+        };
+
+        const downloadFunc = (id, filename) => {
+            ProtectionManager.verify(() => {
+                // Temporarily change title to avoid browser adding "أثر | ..." in header
+                const oldTitle = document.title;
+                const userName = document.getElementById('fullName').value || 'Resume';
+                document.title = userName;
+
+                const element = document.getElementById(id);
+                const opt = {
+                    margin: 0,
+                    filename: filename + '.pdf',
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.title = oldTitle; // Restore title
+                });
+            });
+        };
+
+        document.getElementById('downloadPdfBtn').onclick = () => downloadFunc('cvEN', 'Resume_English');
+        document.getElementById('downloadPdfArBtn').onclick = () => downloadFunc('cvAR', 'Resume_Arabic');
+    </script>
+    <div class="signature-athar" style="margin-top: 50px; border-top: 1px solid #eee; padding: 25px;">
+        اعداد وتنفيذ <span class="designer-name">أ: نبيل الحميد</span>
+    </div>
+</body>
+
+</html>
