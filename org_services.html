@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | خدمات المنظمات الشاملة</title>
+    <link rel="icon" type="image/x-icon" href="تنزيل.jpg">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="protection.js"></script>
+    <script src="js/modules/auth_guard.js"></script>
+    <script src="js/modules/api_proxy.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <style>
+        :root {
+            --org-primary: #0f172a;
+            --org-accent: #6366f1;
+            --org-success: #10b981;
+            --org-warning: #f59e0b;
+            --org-danger: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .org-nav {
+            background: var(--org-primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .org-nav .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .org-nav .brand img {
+            width: 45px;
+            border-radius: 10px;
+        }
+
+        .org-nav .brand-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+
+        .org-nav .badge {
+            background: var(--org-accent);
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            margin-right: 10px;
+        }
+
+        .org-nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .org-nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .org-nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .page-hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(180deg, var(--org-primary) 0%, #1e293b 100%);
+            color: white;
+        }
+
+        .page-hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+
+        .page-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: -50px auto 50px;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Organization Setup Card */
+        .org-setup-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .org-setup-card h2 {
+            color: var(--org-primary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 900;
+        }
+
+        .setup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #f1f5f9;
+            background: #f8fafc;
+            border-radius: 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--org-accent);
+            background: white;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* File Upload Zone */
+        .file-upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-zone:hover {
+            border-color: var(--org-accent);
+            background: #f1f5f9;
+        }
+
+        .file-upload-zone.dragover {
+            border-color: var(--org-accent);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .file-upload-zone i {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-zone p {
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-zone .supported {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .uploaded-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #e0e7ff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .uploaded-file .remove-file {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* Services Grid */
+        .services-section {
+            margin-top: 40px;
+        }
+
+        .services-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: var(--org-primary);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .service-box {
+            background: white;
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            border: 2px solid #f1f5f9;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .service-box::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--org-accent);
+            transform: scaleX(0);
+            transition: 0.4s;
+            transform-origin: right;
+        }
+
+        .service-box:hover::after {
+            transform: scaleX(1);
+        }
+
+        .service-box:hover {
+            border-color: var(--org-accent);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
+        }
+
+        .service-box.active {
+            border-color: var(--org-accent);
+            background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .service-box .icon {
+            font-size: 3rem;
+            margin-bottom: 5px;
+            transition: 0.5s;
+        }
+
+        .service-box:hover .icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .service-box h3 {
+            color: var(--org-primary);
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .service-box p {
+            color: #64748b;
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .service-box .tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* Action Button */
+        .action-section {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, var(--org-accent) 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-analyze:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-analyze:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            margin-top: 50px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .result-card h3 {
+            color: var(--org-primary);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+
+        .result-content {
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .result-content ul {
+            padding-right: 25px;
+        }
+
+        .result-content li {
+            margin-bottom: 10px;
+        }
+
+        .result-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .result-content table th,
+        .result-content table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: right;
+        }
+
+        .result-content table th {
+            background: #f1f5f9;
+            font-weight: 700;
+        }
+
+        /* Export Actions */
+        .export-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn-export {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-export.primary {
+            background: var(--org-accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-export.secondary {
+            background: white;
+            color: var(--org-primary);
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--org-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            margin-top: 30px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-hero h1 {
+                font-size: 2rem;
+            }
+
+            .org-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Access Check Script -->
+    <script>
+        (function () {
+            const userRaw = localStorage.getItem('athar_user');
+            let hasOrgAccess = false;
+
+            if (userRaw) {
+                try {
+                    const user = JSON.parse(userRaw);
+                    hasOrgAccess = user.isOrganization === true || user.isOrganization === "true" ||
+                        user.orgAccess === true || user.orgAccess === "true" ||
+                        user.isAdmin === true || user.isAdmin === "true" ||
+                        user.userType === "institution" || user.userType === "organization";
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
+            if (!hasOrgAccess) {
+                // إعادة توجيه للصفحة الرئيسية مع إظهار رسالة
+                sessionStorage.setItem('show_org_access_modal', 'true');
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <!-- Navigation -->
+    <nav class="org-nav">
+        <a href="index.html" class="brand">
+            <img src="تنزيل.jpg" alt="أثر">
+            <span class="brand-text">أثـــــر <span class="badge">خدمات المنظمات</span></span>
+        </a>
+        <div class="org-nav-links">
+            <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+            <a href="ops_dashboard.html"><i class="fas fa-th-large"></i> لوحة التحكم</a>
+            <a href="library_v3.html"><i class="fas fa-book"></i> المكتبة</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="page-hero">
+        <h1>🏢 مركز خدمات المنظمات الشامل</h1>
+        <p>استشارات مؤسسية ذكية مخصصة 100% لمنظمتك - تطوير الهياكل، السياسات، المشاريع، والحوكمة</p>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Organization Setup -->
+        <div class="org-setup-card">
+            <h2><i class="fas fa-building"></i> معلومات المنظمة</h2>
+            <div class="setup-grid">
+                <div class="form-group">
+                    <label>اسم المنظمة</label>
+                    <input type="text" id="orgName" placeholder="أدخل اسم المنظمة">
+                </div>
+                <div class="form-group">
+                    <label>نوع المنظمة</label>
+                    <select id="orgType">
+                        <option value="">-- اختر نوع المنظمة --</option>
+                        <option value="humanitarian">إنسانية (Humanitarian)</option>
+                        <option value="development">تنموية (Development)</option>
+                        <option value="rights">حقوقية (Human Rights)</option>
+                        <option value="education">تعليمية (Education)</option>
+                        <option value="health">صحية (Health)</option>
+                        <option value="local">محلية (Local NGO)</option>
+                        <option value="international">دولية (INGO)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>حجم المنظمة</label>
+                    <select id="orgSize">
+                        <option value="">-- اختر حجم المنظمة --</option>
+                        <option value="startup">ناشئة (أقل من 10 موظفين)</option>
+                        <option value="small">صغيرة (10-50 موظف)</option>
+                        <option value="medium">متوسطة (50-200 موظف)</option>
+                        <option value="large">كبيرة (أكثر من 200 موظف)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الدولة / السياق الجغرافي</label>
+                    <input type="text" id="orgCountry" placeholder="مثال: اليمن، سوريا، السودان">
+                </div>
+                <div class="form-group">
+                    <label>المرحلة المؤسسية</label>
+                    <select id="orgPhase">
+                        <option value="">-- اختر المرحلة --</option>
+                        <option value="founding">مرحلة التأسيس</option>
+                        <option value="growth">مرحلة التوسع والنمو</option>
+                        <option value="restructure">إعادة هيكلة</option>
+                        <option value="mature">مرحلة النضج والاستدامة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>القطاعات / البرامج الحالية</label>
+                    <input type="text" id="orgSectors" placeholder="مثال: WASH, Protection, FSL, Education">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label>التحديات الرئيسية التي تواجهها المنظمة</label>
+                <textarea id="orgChallenges" rows="4"
+                    placeholder="صف التحديات المؤسسية الحالية: ضعف الهيكلة، غياب السياسات، صعوبات التمويل، مشاكل MEAL..."></textarea>
+            </div>
+
+            <!-- File Upload Zone -->
+            <div class="form-group" style="margin-top: 30px;">
+                <label><i class="fas fa-cloud-upload-alt"></i> رفع الملفات المؤسسية (اختياري)</label>
+                <div class="file-upload-zone" id="fileDropZone">
+                    <i class="fas fa-file-upload"></i>
+                    <p>اسحب الملفات هنا أو انقر للاختيار</p>
+                    <p class="supported">الملفات المدعومة: PDF, DOCX, DOC, TXT (حد أقصى 10MB لكل ملف)</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc,.txt" style="display: none;">
+                </div>
+                <div class="uploaded-files" id="uploadedFilesList"></div>
+            </div>
+        </div>
+
+        <!-- Services Selection -->
+        <section class="services-section">
+            <h2>🎯 اختر الخدمات المطلوبة</h2>
+            <div class="services-grid">
+                <div class="service-box" data-service="structure" onclick="toggleService(this)">
+                    <span class="tag">هيكلة</span>
+                    <div class="icon">🏗️</div>
+                    <h3>تطوير الهيكل التنظيمي</h3>
+                    <p>تحليل الهيكل الحالي، اقتراح هيكل مخصص، توصيف وظيفي احترافي، وتحديد فجوات التوظيف.</p>
+                </div>
+
+                <div class="service-box" data-service="policies" onclick="toggleService(this)">
+                    <span class="tag">سياسات</span>
+                    <div class="icon">📋</div>
+                    <h3>تطوير السياسات والإجراءات</h3>
+                    <p>سياسات الموارد البشرية، الحماية، منع الاحتيال، وإجراءات العمل (SOPs) متوافقة مع المعايير
+                        الدولية.</p>
+                </div>
+
+                <div class="service-box" data-service="projects" onclick="toggleService(this)">
+                    <span class="tag">مشاريع</span>
+                    <div class="icon">📊</div>
+                    <h3>دعم إدارة المشاريع</h3>
+                    <p>تحسين دورة المشروع، خطط تنفيذ، مصفوفات منطقية، وخطط عمل زمنية متوافقة مع أهداف المنظمة.</p>
+                </div>
+
+                <div class="service-box" data-service="meal" onclick="toggleService(this)">
+                    <span class="tag">MEAL</span>
+                    <div class="icon">📈</div>
+                    <h3>المتابعة والتقييم والمساءلة</h3>
+                    <p>إطار MEAL مناسب، مؤشرات أداء SMART، أدوات جمع البيانات، وآليات الشكاوى والمساءلة.</p>
+                </div>
+
+                <div class="service-box" data-service="hr" onclick="toggleService(this)">
+                    <span class="tag">موارد بشرية</span>
+                    <div class="icon">👥</div>
+                    <h3>تطوير الموارد البشرية</h3>
+                    <p>تحليل فجوات المهارات، خطط تدريب مخصصة، مسارات مهنية، وتحسين آليات التقييم والأداء.</p>
+                </div>
+
+                <div class="service-box" data-service="proposals" onclick="toggleService(this)">
+                    <span class="tag">تمويل</span>
+                    <div class="icon">💰</div>
+                    <h3>كتابة المقترحات المؤسسية</h3>
+                    <p>تحليل قدرة جذب التمويل، تحسين الجاهزية للمانحين، قوالب مقترحات وميزانيات متوافقة.</p>
+                </div>
+
+                <div class="service-box" data-service="governance" onclick="toggleService(this)">
+                    <span class="tag">حوكمة</span>
+                    <div class="icon">⚖️</div>
+                    <h3>تحليل المخاطر والحوكمة</h3>
+                    <p>تحديد المخاطر التشغيلية والمؤسسية، حلول التخفيف، تحسين الشفافية ودعم اتخاذ القرار.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Button -->
+        <div class="action-section">
+            <button class="btn-analyze" id="analyzeBtn" onclick="startAnalysis()">
+                <i class="fas fa-rocket"></i> بدء التحليل وتوليد التوصيات
+            </button>
+            <p style="margin-top: 15px; color: #64748b; font-size: 0.9rem;">
+                سيتم تحليل بيانات منظمتك وتوليد توصيات مخصصة 100% بناءً على احتياجاتك الفعلية
+            </p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <h2 style="text-align: center; margin-bottom: 40px; color: var(--org-primary);">
+                <i class="fas fa-chart-bar"></i> نتائج التحليل والتوصيات
+            </h2>
+            <div id="resultsContainer"></div>
+
+            <div class="export-actions">
+                <button class="btn-export primary" onclick="ProtectionManager.verify(() => window.print())">
+                    <i class="fas fa-file-pdf"></i> تصدير PDF
+                </button>
+                <button class="btn-export secondary" onclick="copyResults()">
+                    <i class="fas fa-copy"></i> نسخ النتائج
+                </button>
+                <button class="btn-export secondary" onclick="startNewAnalysis()">
+                    <i class="fas fa-redo"></i> تحليل جديد
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري تحليل بيانات المنظمة...</div>
+        <div class="loading-subtext" id="loadingSubtext">يتم الآن بناء التوصيات المخصصة</div>
+    </div>
+
+    <script>
+        // State Management
+        let selectedServices = [];
+        let uploadedFiles = [];
+        let analysisResults = {};
+
+        // File Upload Handling
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFilesList = document.getElementById('uploadedFilesList');
+
+        fileDropZone.addEventListener('click', () => fileInput.click());
+
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.add('dragover');
+        });
+
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.classList.remove('dragover');
+        });
+
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        async function handleFiles(files) {
+            for (let file of files) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`الملف "${file.name}" يتجاوز الحد المسموح (10MB)`);
+                    continue;
+                }
+
+                const allowedTypes = ['.pdf', '.docx', '.doc', '.txt'];
+                const ext = '.' + file.name.split('.').pop().toLowerCase();
+                if (!allowedTypes.includes(ext)) {
+                    alert(`نوع الملف "${file.name}" غير مدعوم`);
+                    continue;
+                }
+
+                // Read file content
+                const content = await readFileContent(file);
+                uploadedFiles.push({
+                    name: file.name,
+                    type: ext,
+                    content: content
+                });
+
+                renderUploadedFiles();
+            }
+        }
+
+        async function readFileContent(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (file.name.endsWith('.txt')) {
+                        resolve(e.target.result);
+                    } else {
+                        // For PDF/DOCX, store base64 for now (can be processed server-side)
+                        resolve(`[ملف: ${file.name}]`);
+                    }
+                };
+                if (file.name.endsWith('.txt')) {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function renderUploadedFiles() {
+            uploadedFilesList.innerHTML = uploadedFiles.map((f, i) => `
+                <div class="uploaded-file">
+                    <i class="fas fa-file"></i>
+                    <span>${f.name}</span>
+                    <button class="remove-file" onclick="removeFile(${i})"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            renderUploadedFiles();
+        }
+
+        // Service Selection
+        function toggleService(element) {
+            element.classList.toggle('active');
+            const service = element.dataset.service;
+
+            if (element.classList.contains('active')) {
+                if (!selectedServices.includes(service)) {
+                    selectedServices.push(service);
+                }
+            } else {
+                selectedServices = selectedServices.filter(s => s !== service);
+            }
+        }
+
+        // Main Analysis Function
+        async function startAnalysis() {
+            // Validate inputs
+            const orgData = {
+                name: document.getElementById('orgName').value,
+                type: document.getElementById('orgType').value,
+                size: document.getElementById('orgSize').value,
+                country: document.getElementById('orgCountry').value,
+                phase: document.getElementById('orgPhase').value,
+                sectors: document.getElementById('orgSectors').value,
+                challenges: document.getElementById('orgChallenges').value
+            };
+
+            if (!orgData.type) {
+                alert('يرجى اختيار نوع المنظمة');
+                return;
+            }
+
+            if (selectedServices.length === 0) {
+                alert('يرجى اختيار خدمة واحدة على الأقل');
+                return;
+            }
+
+            // Show loading
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingSubtext = document.getElementById('loadingSubtext');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            loadingOverlay.classList.add('active');
+            analyzeBtn.disabled = true;
+
+            const loadingMessages = [
+                'جاري تحليل بيانات المنظمة...',
+                'يتم بناء الهيكل التنظيمي المقترح...',
+                'جاري إعداد السياسات والإجراءات...',
+                'يتم تحليل فجوات الأداء...',
+                'جاري توليد التوصيات المخصصة...'
+            ];
+
+            let msgIndex = 0;
+            const msgInterval = setInterval(() => {
+                msgIndex = (msgIndex + 1) % loadingMessages.length;
+                loadingSubtext.textContent = loadingMessages[msgIndex];
+            }, 3000);
+
+            try {
+                // Build the comprehensive prompt
+                const prompt = buildOrgServicesPrompt(orgData, selectedServices, uploadedFiles);
+
+                // Call AI
+                const result = await apiProxy.callAI(prompt, {
+                    model: "llama-3.3-70b-versatile",
+                    temperature: 0.4
+                });
+
+                // Process and display results
+                if (result) {
+                    analysisResults = parseOrgResults(result, selectedServices);
+                    displayResults(analysisResults);
+                } else {
+                    throw new Error('لم يتم استلام نتائج من النظام');
+                }
+            } catch (error) {
+                console.error('Analysis Error:', error);
+                alert('حدث خطأ أثناء التحليل. يرجى المحاولة مرة أخرى.');
+            } finally {
+                clearInterval(msgInterval);
+                loadingOverlay.classList.remove('active');
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        function buildOrgServicesPrompt(orgData, services, files) {
+            const serviceLabels = {
+                structure: 'تطوير الهيكل التنظيمي وبناء الفرق',
+                policies: 'تطوير السياسات والإجراءات (Policies & SOPs)',
+                projects: 'دعم إدارة المشاريع والبرامج',
+                meal: 'المتابعة والتقييم والمساءلة (MEAL)',
+                hr: 'تطوير الموارد البشرية وبناء القدرات',
+                proposals: 'كتابة وتطوير المقترحات المؤسسية',
+                governance: 'تحليل المخاطر والحوكمة'
+            };
+
+            const orgTypeLabels = {
+                humanitarian: 'إنسانية',
+                development: 'تنموية',
+                rights: 'حقوقية',
+                education: 'تعليمية',
+                health: 'صحية',
+                local: 'محلية',
+                international: 'دولية'
+            };
+
+            const orgSizeLabels = {
+                startup: 'ناشئة',
+                small: 'صغيرة',
+                medium: 'متوسطة',
+                large: 'كبيرة'
+            };
+
+            const orgPhaseLabels = {
+                founding: 'تأسيس',
+                growth: 'توسع ونمو',
+                restructure: 'إعادة هيكلة',
+                mature: 'نضج واستدامة'
+            };
+
+            const requestedServices = services.map(s => serviceLabels[s]).join('\n- ');
+            const filesContent = files.length > 0 ? files.map(f => f.content).join('\n\n') : 'لا توجد ملفات مرفوعة';
+
+            return `
+أنت مستشار استراتيجي أول للمنظمات الإنسانية والتنموية وغير الربحية، تعمل ضمن منصة "أثر"، ومتخصص في:
+- بناء الهياكل المؤسسية
+- تطوير الأنظمة والعمليات
+- إدارة البرامج والمشاريع
+- الحوكمة، المتابعة والتقييم، الموارد البشرية، وبناء القدرات
+
+════════════════════════════
+📋 بيانات المنظمة المُدخلة
+════════════════════════════
+- اسم المنظمة: ${orgData.name || 'غير محدد'}
+- نوع المنظمة: ${orgTypeLabels[orgData.type] || orgData.type}
+- حجم المنظمة: ${orgSizeLabels[orgData.size] || 'غير محدد'}
+- الدولة / السياق: ${orgData.country || 'غير محدد'}
+- المرحلة المؤسسية: ${orgPhaseLabels[orgData.phase] || 'غير محدد'}
+- القطاعات / البرامج: ${orgData.sectors || 'غير محدد'}
+- التحديات المعلنة: ${orgData.challenges || 'غير محددة'}
+
+════════════════════════════
+📎 الملفات المرفوعة
+════════════════════════════
+${filesContent}
+
+════════════════════════════
+🎯 الخدمات المطلوبة
+════════════════════════════
+- ${requestedServices}
+
+════════════════════════════
+⚠️ قواعد إلزامية للمخرجات
+════════════════════════════
+1. كل خدمة تكون مخصصة 100% لهذه المنظمة بالتحديد
+2. عملية وقابلة للتطبيق الفوري
+3. مكتوبة بلغة عربية احترافية غير تسويقية
+4. يُمنع التكرار أو النسخ بين الأقسام
+5. يُمنع العناوين العامة بدون شرح تفصيلي
+
+════════════════════════════
+📤 صيغة المخرجات (JSON)
+════════════════════════════
+أرجع النتيجة حصرياً بصيغة JSON كالتالي:
+{
+    "organization_analysis": {
+        "summary": "ملخص تنفيذي للوضع المؤسسي الحالي",
+        "strengths": ["نقاط القوة"],
+        "weaknesses": ["نقاط الضعف"],
+        "opportunities": ["الفرص"],
+        "threats": ["التهديدات"]
+    },
+    "services": {
+        "structure": {
+            "title": "تطوير الهيكل التنظيمي",
+            "current_analysis": "تحليل الوضع الحالي",
+            "recommendations": ["التوصيات المحددة"],
+            "proposed_structure": "الهيكل المقترح",
+            "job_descriptions": ["توصيف وظيفي مختصر للمناصب الرئيسية"],
+            "gaps": ["فجوات التوظيف"]
+        },
+        "policies": {
+            "title": "السياسات والإجراءات",
+            "required_policies": ["السياسات المطلوبة حسب حجم المنظمة"],
+            "priority_sops": ["إجراءات العمل ذات الأولوية"],
+            "compliance_notes": "ملاحظات التوافق مع المعايير"
+        },
+        "projects": {
+            "title": "إدارة المشاريع",
+            "capacity_assessment": "تقييم القدرة الحالية",
+            "pcm_recommendations": ["توصيات تحسين دورة المشروع"],
+            "tools": ["أدوات مقترحة"]
+        },
+        "meal": {
+            "title": "المتابعة والتقييم",
+            "framework": "إطار MEAL المقترح",
+            "indicators": ["مؤشرات SMART مقترحة"],
+            "tools": ["أدوات جمع البيانات"],
+            "accountability": "آلية المساءلة"
+        },
+        "hr": {
+            "title": "الموارد البشرية",
+            "skills_gaps": ["فجوات المهارات"],
+            "training_plan": ["خطة تدريب مقترحة"],
+            "career_paths": "مسارات مهنية مقترحة"
+        },
+        "proposals": {
+            "title": "المقترحات المؤسسية",
+            "funding_readiness": "تقييم الجاهزية للتمويل",
+            "recommendations": ["توصيات تحسين"],
+            "templates": "قوالب مقترحة"
+        },
+        "governance": {
+            "title": "الحوكمة والمخاطر",
+            "risks": ["المخاطر المحددة"],
+            "mitigation": ["استراتيجيات التخفيف"],
+            "governance_recommendations": ["توصيات الحوكمة"]
+        }
+    },
+    "action_plan": {
+        "immediate": ["إجراءات فورية (0-30 يوم)"],
+        "short_term": ["إجراءات قصيرة المدى (1-3 أشهر)"],
+        "long_term": ["إجراءات طويلة المدى (3-12 شهر)"]
+    }
+}
+
+قم الآن بتحليل المنظمة وتوليد التوصيات المخصصة للخدمات المطلوبة فقط. أرجع JSON فقط بدون أي نص إضافي.
+            `.trim();
+        }
+
+        function parseOrgResults(result, services) {
+            let data = {};
+
+            try {
+                // Extract JSON from response
+                let jsonStr = result;
+                if (typeof result === 'object') {
+                    jsonStr = JSON.stringify(result);
+                }
+
+                // Try to find JSON in the response
+                const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    data = JSON.parse(jsonMatch[0]);
+                }
+            } catch (e) {
+                console.error('Parse error:', e);
+                // Create a basic structure if parsing fails
+                data = {
+                    organization_analysis: {
+                        summary: typeof result === 'string' ? result : 'تم تحليل المنظمة بنجاح',
+                        strengths: [],
+                        weaknesses: [],
+                        opportunities: [],
+                        threats: []
+                    },
+                    services: {},
+                    action_plan: {
+                        immediate: [],
+                        short_term: [],
+                        long_term: []
+                    }
+                };
+            }
+
+            return data;
+        }
+
+        function displayResults(data) {
+            const container = document.getElementById('resultsContainer');
+            let html = '';
+
+            // Organization Analysis
+            if (data.organization_analysis) {
+                const analysis = data.organization_analysis;
+                html += `
+                    <div class="result-card">
+                        <h3><i class="fas fa-building"></i> التحليل المؤسسي</h3>
+                        <div class="result-content">
+                            <p><strong>الملخص التنفيذي:</strong></p>
+                            <p>${analysis.summary || 'غير متوفر'}</p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                                <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; border-right: 4px solid #10b981;">
+                                    <strong style="color: #10b981;">✅ نقاط القوة</strong>
+                                    <ul>${(analysis.strengths || []).map(s => `<li>${s}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                                <div style="background: #fef2f2; padding: 15px; border-radius: 10px; border-right: 4px solid #ef4444;">
+                                    <strong style="color: #ef4444;">⚠️ نقاط الضعف</strong>
+                                    <ul>${(analysis.weaknesses || []).map(w => `<li>${w}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                                <div style="background: #eff6ff; padding: 15px; border-radius: 10px; border-right: 4px solid #3b82f6;">
+                                    <strong style="color: #3b82f6;">🚀 الفرص</strong>
+                                    <ul>${(analysis.opportunities || []).map(o => `<li>${o}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                                <div style="background: #fefce8; padding: 15px; border-radius: 10px; border-right: 4px solid #f59e0b;">
+                                    <strong style="color: #f59e0b;">🔥 التهديدات</strong>
+                                    <ul>${(analysis.threats || []).map(t => `<li>${t}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Services Results
+            if (data.services) {
+                const serviceIcons = {
+                    structure: '🏗️',
+                    policies: '📋',
+                    projects: '📊',
+                    meal: '📈',
+                    hr: '👥',
+                    proposals: '💰',
+                    governance: '⚖️'
+                };
+
+                for (const [key, service] of Object.entries(data.services)) {
+                    if (service && selectedServices.includes(key)) {
+                        html += `
+                            <div class="result-card">
+                                <h3>${serviceIcons[key] || '📌'} ${service.title || key}</h3>
+                                <div class="result-content">
+                                    ${renderServiceContent(key, service)}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // Action Plan
+            if (data.action_plan) {
+                const plan = data.action_plan;
+                html += `
+                    <div class="result-card">
+                        <h3><i class="fas fa-tasks"></i> خطة العمل المقترحة</h3>
+                        <div class="result-content">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                <div style="background: #fef3c7; padding: 20px; border-radius: 10px;">
+                                    <strong style="color: #d97706;">🔥 إجراءات فورية (0-30 يوم)</strong>
+                                    <ul>${(plan.immediate || []).map(i => `<li>${i}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                                <div style="background: #dbeafe; padding: 20px; border-radius: 10px;">
+                                    <strong style="color: #2563eb;">📅 قصيرة المدى (1-3 أشهر)</strong>
+                                    <ul>${(plan.short_term || []).map(s => `<li>${s}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                                <div style="background: #dcfce7; padding: 20px; border-radius: 10px;">
+                                    <strong style="color: #16a34a;">🎯 طويلة المدى (3-12 شهر)</strong>
+                                    <ul>${(plan.long_term || []).map(l => `<li>${l}</li>`).join('') || '<li>غير محدد</li>'}</ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            document.getElementById('resultsSection').style.display = 'block';
+
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderServiceContent(key, service) {
+            let content = '';
+
+            for (const [field, value] of Object.entries(service)) {
+                if (field === 'title') continue;
+
+                const fieldLabel = getFieldLabel(field);
+
+                if (Array.isArray(value)) {
+                    content += `
+                        <div style="margin-bottom: 20px;">
+                            <strong>${fieldLabel}:</strong>
+                            <ul>${value.map(v => `<li>${v}</li>`).join('')}</ul>
+                        </div>
+                    `;
+                } else if (typeof value === 'string' && value) {
+                    content += `
+                        <div style="margin-bottom: 20px;">
+                            <strong>${fieldLabel}:</strong>
+                            <p>${value}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            return content || '<p>لا توجد بيانات متاحة لهذه الخدمة</p>';
+        }
+
+        function getFieldLabel(field) {
+            const labels = {
+                current_analysis: 'تحليل الوضع الحالي',
+                recommendations: 'التوصيات',
+                proposed_structure: 'الهيكل المقترح',
+                job_descriptions: 'التوصيف الوظيفي',
+                gaps: 'فجوات التوظيف',
+                required_policies: 'السياسات المطلوبة',
+                priority_sops: 'إجراءات العمل ذات الأولوية',
+                compliance_notes: 'ملاحظات التوافق',
+                capacity_assessment: 'تقييم القدرة',
+                pcm_recommendations: 'توصيات دورة المشروع',
+                tools: 'الأدوات المقترحة',
+                framework: 'الإطار المقترح',
+                indicators: 'المؤشرات',
+                accountability: 'آلية المساءلة',
+                skills_gaps: 'فجوات المهارات',
+                training_plan: 'خطة التدريب',
+                career_paths: 'المسارات المهنية',
+                funding_readiness: 'الجاهزية للتمويل',
+                templates: 'القوالب المقترحة',
+                risks: 'المخاطر',
+                mitigation: 'استراتيجيات التخفيف',
+                governance_recommendations: 'توصيات الحوكمة'
+            };
+            return labels[field] || field;
+        }
+
+        function copyResults() {
+            const resultsText = document.getElementById('resultsContainer').innerText;
+            navigator.clipboard.writeText(resultsText).then(() => {
+                alert('تم نسخ النتائج بنجاح!');
+            }).catch(() => {
+                alert('فشل في نسخ النتائج');
+            });
+        }
+
+        function startNewAnalysis() {
+            // Reset form
+            document.getElementById('orgName').value = '';
+            document.getElementById('orgType').value = '';
+            document.getElementById('orgSize').value = '';
+            document.getElementById('orgCountry').value = '';
+            document.getElementById('orgPhase').value = '';
+            document.getElementById('orgSectors').value = '';
+            document.getElementById('orgChallenges').value = '';
+
+            // Reset services
+            selectedServices = [];
+            document.querySelectorAll('.service-box').forEach(box => box.classList.remove('active'));
+
+            // Reset files
+            uploadedFiles = [];
+            renderUploadedFiles();
+
+            // Hide results
+            document.getElementById('resultsSection').style.display = 'none';
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    <div class="signature-athar" style="margin-top: 50px; background: rgba(15, 23, 42, 0.05); padding: 40px 20px;">
+        اعداد وتنفيذ <span class="designer-name">أ: نبيل الحميد</span>
+    </div>
+</body>
+
+</html>

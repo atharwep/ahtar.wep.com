@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | الملف التعريفي للمنظمة (Org CV)</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Outfit:wght@300;600;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="protection.js"></script>
+    <script src="js/modules/auth_guard.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+    <script src="js/modules/api_proxy.js"></script>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 1000px; padding-bottom: 80px;">
+        <nav>
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثـــــر</div>
+                    <div class="logo-slogan">بناء القدرات المؤسسية</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost">🏠 الرئيسية</a>
+            </div>
+        </nav>
+
+        <main class="anim-fade-in" style="margin-top: 40px;">
+            <div class="glass-card" style="border-top: 5px solid var(--primary); padding: 50px; border-radius: 30px;">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h1 style="font-weight: 900; color: var(--primary); font-size: 2.2rem; margin-bottom: 10px;">بناء
+                        ملف القدرات (Capability Statement)</h1>
+                    <p style="color: var(--text-secondary); font-size: 1.1rem;">حول بيانات منظمتك إلى ملف تعريفي احترافي
+                        جاهز للتقديم للمنظمات الدولية والمانحين.</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                    <div class="form-group">
+                        <label>اسم المنظمة:</label>
+                        <input type="text" id="orgName" placeholder="مثلاً: منظمة أثر للتنمية" class="elegant-input">
+                    </div>
+                    <div class="form-group">
+                        <label>القطاعات الرئيسية:</label>
+                        <input type="text" id="orgSector" placeholder="مثلاً: WASH, Education, FSL"
+                            class="elegant-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>نبذة تاريخية ورؤية المنظمة:</label>
+                    <textarea id="orgHistory" rows="4" placeholder="تحدث عن متى تأسست والهدف الأساسي للهوية المؤسسية..."
+                        style="width:100%; min-height:100px;"></textarea>
+                </div>
+
+                <div
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top:25px; margin-bottom: 25px;">
+                    <div class="form-group">
+                        <label>الميزانية السنوية (اختياري):</label>
+                        <input type="text" id="orgBudget" placeholder="مثلاً: 500k USD" class="elegant-input">
+                    </div>
+                    <div class="form-group">
+                        <label>أبرز المانحين السابقين:</label>
+                        <input type="text" id="orgDonors" placeholder="مثلاً: UNDP, UNICEF, Care" class="elegant-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>أهم المشاريع المنفذة (اسم المشروع - الأثر):</label>
+                    <textarea id="orgProjects" rows="4" placeholder="اذكر أهم 3 تدخلات ميدانية ناجحة للمنظمة..."
+                        style="width:100%; min-height:100px;"></textarea>
+                </div>
+
+                <button id="generateBtn" onclick="generateOrgCV()" class="btn btn-primary"
+                    style="width: 100%; justify-content: center; padding: 20px; font-size: 1.2rem; border-radius: 20px; margin-top: 20px;">
+                    تحليل البيانات وتوليد الملف التعريفي 🚀
+                </button>
+            </div>
+
+            <div id="loader" style="display: none; margin: 40px 0; text-align: center;">
+                <div class="loading-spinner"
+                    style="border: 4px solid var(--glass-border); border-top-color: var(--primary); width: 60px; height: 60px; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;">
+                </div>
+                <h3 style="color: var(--primary); font-weight: 800;">جاري صياغة الهوية المؤسسية...</h3>
+            </div>
+
+            <div id="resultArea" style="display: none;" class="anim-slide-up">
+                <div class="glass-card"
+                    style="margin-top: 40px; border-radius: 30px; padding: 60px; border: 2px solid var(--primary);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--primary); padding-bottom: 30px; margin-bottom: 40px;">
+                        <div>
+                            <h2 id="resName"
+                                style="color: var(--primary); font-size: 2.5rem; font-weight: 900; margin: 0;"></h2>
+                            <p id="resSlogan"
+                                style="color: var(--text-secondary); font-size: 1.2rem; margin-top: 10px; font-weight: 600;">
+                            </p>
+                        </div>
+                        <div style="text-align: left;">
+                            <div
+                                style="background: var(--primary); color: white; padding: 8px 20px; border-radius: 10px; font-weight: bold;">
+                                Capability Statement</div>
+                            <div id="dateNow" style="font-size: 0.8rem; margin-top: 5px; color: var(--text-secondary);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 50px;">
+                        <div>
+                            <h3 class="res-sec-title"><i class="fas fa-info-circle"></i> الملخص التنفيذي (Executive
+                                Summary)</h3>
+                            <p id="resAbout"
+                                style="line-height: 2; font-size: 1.05rem; color: var(--text-primary); margin-bottom: 40px;">
+                            </p>
+
+                            <h3 class="res-sec-title"><i class="fas fa-cogs"></i> القدرات الفنية (Core Competencies)
+                            </h3>
+                            <div id="resExpertise"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px;">
+                            </div>
+
+                            <h3 class="res-sec-title"><i class="fas fa-history"></i> سوابق الخبرة الجوهرية (Past
+                                Performance)</h3>
+                            <div id="resProjects"></div>
+                        </div>
+
+                        <div
+                            style="background: rgba(0,0,0,0.02); padding: 30px; border-radius: 25px; border: 1px solid var(--glass-border);">
+                            <h3
+                                style="color: var(--primary); margin-bottom: 25px; font-weight: 800; border-bottom: 1px solid var(--primary); padding-bottom: 10px;">
+                                📊 مؤشرات الأداء</h3>
+                            <div id="resStats" style="margin-bottom: 40px;"></div>
+
+                            <h3
+                                style="color: var(--primary); margin-bottom: 25px; font-weight: 800; border-bottom: 1px solid var(--primary); padding-bottom: 10px;">
+                                🤝 شبكة الشركاء</h3>
+                            <div id="resPartners" style="font-weight: 700; color: var(--text-primary);"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="ProtectionManager.verify(() => window.print())" class="btn btn-ghost"
+                        style="width: 100%; margin-top: 50px; justify-content: center; height: 60px; font-size: 1.1rem; border: 1px solid var(--primary);">
+                        <i class="fas fa-file-pdf"></i> تصدير الملف الرسمي للمنظمة
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .elegant-input {
+            padding: 16px 20px;
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            background: white;
+            width: 100%;
+            font-family: 'Cairo';
+        }
+
+        .res-sec-title {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .res-sec-title i {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .expert-pill {
+            background: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .project-block {
+            margin-bottom: 25px;
+            position: relative;
+            padding-right: 20px;
+            border-right: 3px solid var(--primary);
+        }
+
+        .project-title {
+            font-weight: 800;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .project-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <script>
+        const apiProxy = new APIProxy();
+
+        async function generateOrgCV() {
+            const name = document.getElementById('orgName').value;
+            const sector = document.getElementById('orgSector').value;
+            const history = document.getElementById('orgHistory').value;
+            const projects = document.getElementById('orgProjects').value;
+
+            if (!name || !history) return alert("يرجى إدخال اسم المنظمة ونبذة عنها لتتم عملية التحليل.");
+
+            const btn = document.getElementById('generateBtn');
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+
+            btn.disabled = true;
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            const prompt = PromptBuilder.buildUnifiedPrompt('هوية', name, {
+                sector: sector,
+                jobDescription: history, // history is the main context here
+                fileContent: projects, // using projects as extra context
+                itemCount: 10
+            });
+
+            try {
+                const data = await apiProxy.callAI(prompt, { model: "llama-3.3-70b-versatile" });
+                if (!data) throw new Error("AI_ERROR");
+
+                document.getElementById('resName').innerText = name;
+                document.getElementById('resSlogan').innerText = data.slogan;
+                document.getElementById('resAbout').innerText = data.about_professional;
+                document.getElementById('dateNow').innerText = new Date().toLocaleDateString('ar-EG');
+
+                document.getElementById('resExpertise').innerHTML = (data.expertise_points || []).map(p => `<div class="expert-pill">${p}</div>`).join('');
+                document.getElementById('resProjects').innerHTML = (data.projects_formatted || []).map(p => `
+                    <div class="project-block">
+                        <span class="project-title">${p.title}</span>
+                        <div class="project-desc">${p.desc}</div>
+                    </div>
+                `).join('');
+                document.getElementById('resStats').innerHTML = (data.stats_inference || []).map(s => `
+                    <div style="margin-bottom:15px; font-weight:700; color:var(--primary);"><i class="fas fa-check-circle"></i> ${s}</div>
+                `).join('');
+                document.getElementById('resPartners').innerText = document.getElementById('orgDonors').value || "شركاء محليون ودوليون";
+
+                resultArea.style.display = 'block';
+                window.scrollTo({ top: resultArea.offsetTop - 50, behavior: 'smooth' });
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ في بناء الملف التعريفي المؤسسي.");
+            } finally {
+                btn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

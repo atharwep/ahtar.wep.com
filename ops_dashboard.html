@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | بوابة العمليات المؤسسية</title>
+    <link rel="icon" type="image/x-icon" href="تنزيل.jpg">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="js/modules/auth_guard.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <style>
+        .ops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .ops-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .ops-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .ops-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .ops-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+        }
+
+        .ops-desc {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .tag-new {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body class="light-theme">
+    <!-- Access Check Script -->
+    <script>
+        (function () {
+            const userRaw = localStorage.getItem('athar_user');
+            let hasOrgAccess = false;
+
+            if (userRaw) {
+                try {
+                    const user = JSON.parse(userRaw);
+                    hasOrgAccess = user.isOrganization === true || user.isOrganization === "true" ||
+                        user.orgAccess === true || user.orgAccess === "true" ||
+                        user.isAdmin === true || user.isAdmin === "true" ||
+                        user.userType === "institution" || user.userType === "organization";
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
+            if (!hasOrgAccess) {
+                // إعادة توجيه للصفحة الرئيسية مع إظهار رسالة
+                sessionStorage.setItem('show_org_access_modal', 'true');
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <nav>
+        <div class="logo-container">
+            <a href="index.html" style="text-decoration:none; display:flex; align-items:center; gap:10px;">
+                <img src="تنزيل.jpg" alt="Logo" style="width:40px; border-radius:5px;">
+                <div class="logo">أثـــــر <span
+                        style="font-size:0.8rem; background:#333; color:white; padding:2px 6px; border-radius:4px;">Ops</span>
+                </div>
+            </a>
+        </div>
+        <div class="nav-actions">
+            <a href="index.html" class="btn btn-ghost">بوابة الأفراد</a>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <header style="text-align:center; padding:40px 0;">
+            <h1 style="font-size:2.5rem; font-weight:900; margin-bottom:15px;">مركز العمليات الذكية للمنظمات</h1>
+            <p style="color:#64748b; font-size:1.1rem; max-width:600px; margin:0 auto;">مساعدك الرقمي لإدارة السياسات،
+                الاجتماعات، ومراجعة الجودة، مدعوم بأحدث التقنيات البرمجية.</p>
+        </header>
+
+        <div class="ops-grid">
+            <!-- Policy Assistant -->
+            <a href="org_policies.html" class="ops-card">
+                <div>
+                    <div class="ops-icon">⚖️</div>
+                    <h3 class="ops-title">مساعد السياسات <span class="tag-new">جديد</span></h3>
+                    <p class="ops-desc">حول ملفات السياسات المعقدة إلى أدلة تنفيذية، قوائم تحقق، وتحليل للمخاطر بضغطة
+                        زر.</p>
+                </div>
+                <div style="margin-top:20px; color:var(--primary); font-weight:bold;">ابدأ التحليل &larr;</div>
+            </a>
+
+            <!-- Internal Review -->
+            <a href="org_review.html" class="ops-card">
+                <div>
+                    <div class="ops-icon">🕵️</div>
+                    <h3 class="ops-title">بوابة التدقيق</h3>
+                    <p class="ops-desc">راجع مسودات المقترحات قبل إرسالها للمانحين. اكتشف الأخطاء القاتلة، التناقضات،
+                        وضعف الصياغة.</p>
+                </div>
+                <div style="margin-top:20px; color:var(--primary); font-weight:bold;">مراجعة مسودة &larr;</div>
+            </a>
+
+            <!-- Meeting Assistant -->
+            <a href="org_meetings.html" class="ops-card">
+                <div>
+                    <div class="ops-icon">📅</div>
+                    <h3 class="ops-title">مساعد الاجتماعات</h3>
+                    <p class="ops-desc">لا تضيع وقتك في صياغة المحاضر. حول الملاحظات الخام إلى قرارات ومهام واضحة
+                        (Action Items).</p>
+                </div>
+                <div style="margin-top:20px; color:var(--primary); font-weight:bold;">معالجة محضر &larr;</div>
+            </a>
+
+            <!-- Org CV -->
+            <a href="org_profile.html" class="ops-card">
+                <div>
+                    <div class="ops-icon">🏢</div>
+                    <h3 class="ops-title">الملف التعريفي (Org CV) <span class="tag-new">جديد</span></h3>
+                    <p class="ops-desc">بناء Capability Statement احترافي للمنظمة جاهز للتقديم للمانحين.</p>
+                </div>
+                <div style="margin-top:20px; color:var(--primary); font-weight:bold;">إنشاء ملف &larr;</div>
+            </a>
+
+            <!-- Comprehensive Org Services -->
+            <a href="org_services.html" class="ops-card"
+                style="border: 2px solid var(--primary); background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+                <div>
+                    <div class="ops-icon">🎯</div>
+                    <h3 class="ops-title">خدمات المنظمات الشاملة <span class="tag-new"
+                            style="background:#4f46e5; color:white;">متميز</span></h3>
+                    <p class="ops-desc">استشارات مؤسسية ذكية: الهيكلة، السياسات، MEAL، الحوكمة، المقترحات، وبناء
+                        القدرات.</p>
+                </div>
+                <div style="margin-top:20px; color:var(--primary); font-weight:bold;">ابدأ التحليل الشامل &larr;</div>
+            </a>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="file-upload-section"
+            style="margin-top: 50px; background: white; border-radius: 20px; padding: 40px; border: 1px solid #e2e8f0;">
+            <h2 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 15px; font-size: 1.5rem;">
+                <span style="font-size: 2rem;">📁</span> رفع الملفات المؤسسية
+            </h2>
+            <p style="color: #64748b; margin-bottom: 25px;">ارفع ملفاتك المؤسسية (سياسات، مقترحات، تقارير، هياكل)
+                لتحليلها ومعالجتها بواسطة أدواتنا الذكية.</p>
+
+            <div id="fileDropZone"
+                style="border: 2px dashed #cbd5e1; border-radius: 15px; padding: 50px; text-align: center; background: #f8fafc; cursor: pointer; transition: 0.3s;">
+                <div style="font-size: 4rem; margin-bottom: 15px;">📤</div>
+                <p style="font-size: 1.1rem; font-weight: 600; color: #334155; margin-bottom: 10px;">اسحب الملفات هنا أو
+                    انقر للاختيار</p>
+                <p style="color: #94a3b8; font-size: 0.9rem;">الملفات المدعومة: PDF, DOCX, DOC, TXT, XLSX (حد أقصى 10MB
+                    لكل ملف)</p>
+                <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc,.txt,.xlsx" style="display: none;">
+            </div>
+
+            <div id="uploadedFilesList" style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
+
+            <div id="fileActions"
+                style="display: none; margin-top: 25px; padding-top: 25px; border-top: 1px solid #e2e8f0;">
+                <p style="font-weight: 700; margin-bottom: 15px; color: #334155;">🎯 اختر الإجراء المطلوب للملفات:</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <a href="org_policies.html" class="action-btn"
+                        style="display: flex; align-items: center; gap: 10px; padding: 15px 25px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: 600; transition: 0.3s;">
+                        ⚖️ تحليل السياسات
+                    </a>
+                    <a href="org_review.html" class="action-btn"
+                        style="display: flex; align-items: center; gap: 10px; padding: 15px 25px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: 600; transition: 0.3s;">
+                        🕵️ تدقيق المقترحات
+                    </a>
+                    <a href="org_services.html" class="action-btn"
+                        style="display: flex; align-items: center; gap: 10px; padding: 15px 25px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: 600; transition: 0.3s;">
+                        🎯 التحليل الشامل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #fileDropZone:hover,
+        #fileDropZone.dragover {
+            border-color: var(--primary);
+            background: #f1f5f9;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #e0e7ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .uploaded-file .file-icon {
+            font-size: 1.2rem;
+        }
+
+        .uploaded-file .remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0;
+            margin-right: 5px;
+        }
+
+        .uploaded-file .remove-btn:hover {
+            color: #dc2626;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+
+    <script>
+        // File Upload Functionality
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFilesList = document.getElementById('uploadedFilesList');
+        const fileActions = document.getElementById('fileActions');
+        let uploadedFiles = [];
+
+        // Click to upload
+        fileDropZone.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop events
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.add('dragover');
+        });
+
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.classList.remove('dragover');
+        });
+
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            for (let file of files) {
+                // Check file size (10MB max)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`الملف "${file.name}" يتجاوز الحد المسموح (10MB)`);
+                    continue;
+                }
+
+                // Check file type
+                const allowedTypes = ['.pdf', '.docx', '.doc', '.txt', '.xlsx'];
+                const ext = '.' + file.name.split('.').pop().toLowerCase();
+                if (!allowedTypes.includes(ext)) {
+                    alert(`نوع الملف "${file.name}" غير مدعوم`);
+                    continue;
+                }
+
+                // Check if file already exists
+                if (uploadedFiles.some(f => f.name === file.name)) {
+                    continue;
+                }
+
+                uploadedFiles.push({
+                    name: file.name,
+                    size: file.size,
+                    type: ext
+                });
+            }
+
+            renderFiles();
+
+            // Store files in sessionStorage for other pages
+            sessionStorage.setItem('ops_uploaded_files', JSON.stringify(uploadedFiles.map(f => f.name)));
+        }
+
+        function renderFiles() {
+            if (uploadedFiles.length === 0) {
+                uploadedFilesList.innerHTML = '';
+                fileActions.style.display = 'none';
+                return;
+            }
+
+            const fileIcons = {
+                '.pdf': '📕',
+                '.docx': '📘',
+                '.doc': '📘',
+                '.txt': '📄',
+                '.xlsx': '📗'
+            };
+
+            uploadedFilesList.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="uploaded-file">
+                    <span class="file-icon">${fileIcons[file.type] || '📄'}</span>
+                    <span>${file.name}</span>
+                    <span style="color: #94a3b8; font-size: 0.8rem;">(${formatFileSize(file.size)})</span>
+                    <button class="remove-btn" onclick="removeFile(${index})">✕</button>
+                </div>
+            `).join('');
+
+            fileActions.style.display = 'block';
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            renderFiles();
+            sessionStorage.setItem('ops_uploaded_files', JSON.stringify(uploadedFiles.map(f => f.name)));
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Load any previously uploaded files from session
+        window.onload = function () {
+            const savedFiles = sessionStorage.getItem('ops_uploaded_files');
+            if (savedFiles) {
+                const fileNames = JSON.parse(savedFiles);
+                // Note: We can't restore actual file objects, just show the names
+                // This is a limitation of browser security
+            }
+        };
+    </script>
+    <div class="signature-athar" style="margin-top: 50px;">
+        اعداد وتنفيذ <span class="designer-name">أ: نبيل الحميد</span>
+    </div>
+</body>
+
+</html>
