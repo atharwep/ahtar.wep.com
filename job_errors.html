@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | محلل الأخطاء المهنية</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Outfit:wght@300;600;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 950px; padding-bottom: 100px;">
+        <nav class="premium-nav">
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثـــــر</div>
+                    <div class="logo-slogan">عين الخبير للكشف عن الثغرات</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost"><i class="fas fa-home"></i> الرئيسية</a>
+            </div>
+        </nav>
+
+        <main class="anim-fade-in" style="margin-top: 50px;">
+            <div class="glass-card main-input-card" style="border-top-color: var(--danger);">
+                <div class="card-header-icon" style="color: var(--danger);">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h1>كاشف الأخطاء المهنية</h1>
+                <p class="subtitle">أدخل المسمى الوظيفي أو ارفع ملفك (سيرة ذاتية / وصف وظيفي) لنقوم بتحليل أسباب الرفض
+                    المحتملة وتقديم حلول إيجابية.</p>
+
+                <div class="input-wrapper">
+                    <input type="text" id="jobTitle" placeholder="مثلاً: منسق لوجستي، أو ارفع ملف..."
+                        class="premium-input" oninput="handleAutoTrigger(this)">
+
+                    <label for="fileUpload" class="file-upload-btn" title="رفع ملف (PDF/DOCX)">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </label>
+                    <input type="file" id="fileUpload" accept=".pdf,.docx,.doc,.txt" style="display: none;"
+                        onchange="handleFileUpload(this)">
+
+                    <div id="aiPulse" class="ai-pulse" style="display: none;">
+                        <span style="background: var(--danger);"></span>
+                        <span style="background: var(--danger);"></span>
+                        <span style="background: var(--danger);"></span>
+                    </div>
+                </div>
+                <div id="fileNameDisplay"
+                    style="margin-top: 10px; color: var(--danger); font-size: 0.9rem; display: none;"></div>
+            </div>
+
+            <div id="loader" class="premium-loader" style="display: none;">
+                <div class="loader-spinner" style="border-top-color: var(--danger);"></div>
+                <h3 style="color: var(--danger);">جاري فحص الملف وتحليل الثغرات...</h3>
+                <div class="loader-bar">
+                    <div class="loader-progress" style="background: var(--danger);"></div>
+                </div>
+            </div>
+
+            <div id="resultArea" style="display: none;" class="anim-slide-up">
+                <div class="glass-card result-card">
+                    <h3 class="section-title" style="color: var(--danger);"><i class="fas fa-shield-virus"></i> تقرير
+                        التحليل الإيجابي وتجاوز الرفض:</h3>
+                    <div id="errorsContainer" class="steps-grid"></div>
+
+                    <button onclick="ProtectionManager.verify(() => window.print())" class="btn btn-primary"
+                        style="width: 100%; margin-top: 50px; justify-content: center; background: var(--danger); border-color: var(--danger); height: 60px;">
+                        <i class="fas fa-file-pdf"></i> تصدير تقرير الحماية
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">أثر</div>
+            <div class="footer-credit">تطوير وتنفيذ أ. نبيل الحميد &copy; 2025</div>
+        </div>
+    </footer>
+
+    <style>
+        :root {
+            --danger: #ef4444;
+            --bg-body: #fdf2f2;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(239, 68, 68, 0.1);
+            --text-main: #111827;
+            --text-muted: #4b5563;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+        }
+
+        .premium-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            padding: 50px;
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.05);
+        }
+
+        .main-input-card {
+            text-align: center;
+            border-top: 8px solid var(--danger);
+        }
+
+        .card-header-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-weight: 950;
+            font-size: 2.6rem;
+            color: #111827;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 25px 35px;
+            border-radius: 20px;
+            border: 2px solid var(--glass-border);
+            background: white;
+            font-size: 1.3rem;
+            font-family: 'Cairo';
+            text-align: center;
+            transition: 0.4s;
+            padding-left: 60px;
+            /* Space for upload button */
+        }
+
+        .premium-input:focus {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.08);
+            outline: none;
+        }
+
+        .input-wrapper {
+            position: relative;
+            max-width: 600px;
+            /* Matches other pages */
+            margin: 0 auto;
+        }
+
+        .file-upload-btn {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--danger);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .file-upload-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            background: #b91c1c;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .step-card {
+            padding: 30px;
+            background: white;
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            border-right: 6px solid var(--danger);
+            transition: 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--danger);
+        }
+
+        .step-title {
+            color: var(--danger);
+            font-weight: 900;
+            font-size: 1.25rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .step-desc {
+            background: #fef2f2;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px dashed var(--danger);
+            color: var(--text-main);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .step-desc::before {
+            content: '💡 الحل الإيجابي: ';
+            font-weight: 900;
+            color: #b91c1c;
+        }
+
+        .ai-pulse {
+            position: absolute;
+            right: 25px;
+            /* Moved to right to avoid overlap with upload btn */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+
+        .ai-pulse span {
+            width: 5px;
+            height: 18px;
+            animation: ai-pulse 0.8s infinite ease-in-out;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <script src="js/modules/file_processor.js"></script>
+    <script>
+        let timeout = null;
+        const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbzSdWq5xiGZQZ9-DuaVh57f_3UKLuuYWukgIC3x2vtvt5d2VIyEv4yiJn93-hIrgLL9/exec";
+        let uploadedText = "";
+
+        function handleAutoTrigger(input) {
+            clearTimeout(timeout);
+            const val = input.value.trim();
+            const pulse = document.getElementById('aiPulse');
+            if (val.length < 5 && !uploadedText) { pulse.style.display = 'none'; return; }
+            pulse.style.display = 'flex';
+            timeout = setTimeout(() => { startErrorAnalysis(val); }, 1800);
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('loader');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+            loader.style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            fileNameDisplay.style.display = 'block';
+            fileNameDisplay.innerText = `جاري قراءة الملف: ${file.name}...`;
+
+            try {
+                // Ensure libraries are loaded
+                if (typeof fileProcessor === 'undefined') {
+                    // Fallback check or wait logic could go here, but script tag should load it.
+                    console.warn("FileProcessor not loaded yet");
+                }
+
+                const result = await fileProcessor.processFile(file, { extractText: true });
+                uploadedText = result.text;
+
+                fileNameDisplay.innerText = `تم تحليل الملف: ${file.name} (${result.wordCount} كلمة)`;
+                document.getElementById('jobTitle').value = `ملف: ${file.name}`; // Visual feedback
+
+                // Auto trigger analysis
+                startErrorAnalysis(uploadedText);
+
+            } catch (e) {
+                console.error(e);
+                alert(`فشل قراءة الملف: ${e.message}`);
+                fileNameDisplay.innerText = "";
+                loader.style.display = 'none';
+            }
+        }
+
+        async function startErrorAnalysis(content) {
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            const pulse = document.getElementById('aiPulse');
+
+            const finalText = uploadedText || content;
+
+            if (!finalText || finalText.length < 3) return;
+
+            pulse.style.display = 'none';
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            // More positive, constructive prompt
+            const prompt = PromptBuilder.buildUnifiedPrompt('تحليل', finalText, {
+                itemCount: 30,
+                fileContent: uploadedText ? uploadedText : ''
+            });
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}?action=ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: "You are a career coach returning ONLY valid JSON in Arabic." },
+                            { role: "user", content: prompt }
+                        ]
+                    })
+                });
+
+                const bridgeRes = await res.json();
+                if (bridgeRes.status === "error") throw new Error(bridgeRes.message);
+
+                const aiResponse = bridgeRes.data;
+                const cleanJson = aiResponse.replace(/```json\s*|```\s*/gi, "").trim();
+                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+
+                if (!jsonMatch) throw new Error("JSON_ERROR");
+                const data = JSON.parse(jsonMatch[0]);
+                if (data.error) throw new Error(data.error.message || "AI_ERROR");
+
+                const container = document.getElementById('errorsContainer');
+                const list = data.items || data.points || data.errors || [];
+
+                if (list.length === 0) list.push({ error: "لا توجد بيانات كافية", improvement: "يرجى تقديم تفاصيل أكثر أو ملف أوضح." });
+
+                container.innerHTML = list.map((p, idx) => `
+                    <div class="step-card anim-slide-up" style="animation-delay: ${idx * 0.05}s">
+                        <span class="step-title">${idx + 1}. ${p.q || 'تحدي'}: ${p.error || p.q || ''}</span>
+                        <div class="step-desc">${p.a || p.improvement || ''}</div>
+                    </div>
+                `).join('');
+
+                resultArea.style.display = 'block';
+                window.scrollTo({ top: resultArea.offsetTop - 50, behavior: 'smooth' });
+
+            } catch (e) {
+                console.error(e);
+                alert(`تعذر إجراء التحليل حالياً.\n\nالتفاصيل: ${e.message}`);
+            } finally { loader.style.display = 'none'; }
+        }
+    </script>
+</body>
+
+</html>
