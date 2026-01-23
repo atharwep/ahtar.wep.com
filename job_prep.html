@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | استعداد للمقابلات الاستراتيجية</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Outfit:wght@300;600;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 950px; padding-bottom: 100px;">
+        <nav class="premium-nav">
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثـــــر</div>
+                    <div class="logo-slogan">التحضير الذكي للمستقبل</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost"><i class="fas fa-home"></i> الرئيسية</a>
+                <button id="themeToggle" class="btn btn-ghost"><i class="fas fa-adjust"></i></button>
+            </div>
+        </nav>
+
+        <main class="anim-fade-in" style="margin-top: 50px;">
+            <div class="glass-card main-input-card">
+                <div class="card-header-icon">
+                    <i class="fas fa-microphone-alt"></i>
+                </div>
+                <h1>مدرب المقابلات الذكي</h1>
+                <p class="subtitle">قم بكتابة المسمى الوظيفي لنقوم بتوليد دليل شامل يضم 30 سؤالاً استراتيجياً مع إجابات
+                    نموذجية احترافية.</p>
+
+                <div class="input-wrapper">
+                    <input type="text" id="jobTitle" placeholder="مثلاً: مدرب حماية، أو ارفع سيرتك الذاتية..."
+                        class="premium-input" oninput="handleAutoTrigger(this)">
+
+                    <label for="fileUpload" class="file-upload-btn" title="رفع السيرة الذاتية (PDF/DOCX)">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </label>
+                    <input type="file" id="fileUpload" accept=".pdf,.docx,.doc,.txt" style="display: none;"
+                        onchange="handleFileUpload(this)">
+
+                    <div id="aiPulse" class="ai-pulse" style="display: none;">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                <div class="input-hint">
+                    <i class="fas fa-magic"></i> سيبدأ النظام بالتحليل فوراً عند التوقف عن الكتابة أو رفع الملف...
+                </div>
+            </div>
+
+            <style>
+                .premium-input {
+                    padding-left: 60px;
+                }
+
+                /* Space for upload button */
+
+                .file-upload-btn {
+                    position: absolute;
+                    left: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: var(--primary);
+                    color: white;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: 0.3s;
+                    z-index: 10;
+                    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+                }
+
+                .file-upload-btn:hover {
+                    transform: translateY(-50%) scale(1.1);
+                    background: #4f46e5;
+                }
+            </style>
+
+            <div id="loader" class="premium-loader" style="display: none;">
+                <div class="loader-spinner"></div>
+                <h3 id="loaderText">جاري هندسة 30 سؤالاً احترافياً...</h3>
+                <div class="loader-bar">
+                    <div class="loader-progress"></div>
+                </div>
+            </div>
+
+            <div id="resultArea" style="display: none;" class="anim-slide-up">
+                <div class="glass-card result-card">
+                    <div class="result-header">
+                        <div class="level-badge">
+                            <i class="fas fa-star"></i> <span id="jobLevel">تحليل احترافي</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="ProtectionManager.verify(() => window.print())"
+                                class="btn btn-primary btn-sm">
+                                <i class="fas fa-file-pdf"></i> تصدير الدليل
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="questionsContainer" class="questions-list"></div>
+
+                    <div class="wisdom-section">
+                        <div class="wisdom-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>استراتيجيات النجاح في المقابلة</h3>
+                        </div>
+                        <ul id="tipsList"></ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">أثر</div>
+            <div class="footer-credit">تطوير وتنفيذ أ. نبيل الحميد &copy; 2025</div>
+        </div>
+    </footer>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --accent: #10b981;
+            --danger: #ef4444;
+            --bg-body: #f1f5f9;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-theme {
+            --bg-body: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(51, 65, 85, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+        }
+
+        .premium-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .main-input-card {
+            text-align: center;
+            border-top: 6px solid var(--primary);
+        }
+
+        .card-header-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        h1 {
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 22px 30px;
+            border-radius: 20px;
+            border: 2px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+            font-family: 'Cairo';
+            color: var(--text-main);
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .premium-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px var(--primary-glow);
+            outline: none;
+            background: white;
+        }
+
+        .input-hint {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
+
+        .ai-pulse {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+        }
+
+        .ai-pulse span {
+            width: 4px;
+            height: 16px;
+            background: var(--primary);
+            animation: ai-pulse 0.8s infinite ease-in-out;
+        }
+
+        .ai-pulse span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .ai-pulse span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes ai-pulse {
+
+            0%,
+            100% {
+                transform: scaleY(0.5);
+            }
+
+            50% {
+                transform: scaleY(1.5);
+            }
+        }
+
+        .premium-loader {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--glass-border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-bar {
+            height: 6px;
+            width: 200px;
+            background: var(--glass-border);
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loader-progress {
+            height: 100%;
+            width: 30%;
+            background: var(--primary);
+            border-radius: 10px;
+            animation: progress 2s infinite ease-in-out;
+        }
+
+        @keyframes progress {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(200%);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 25px;
+        }
+
+        .level-badge {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-block {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+        }
+
+        .question-block:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .q-label {
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 15px;
+            position: relative;
+            padding-right: 40px;
+        }
+
+        .q-label::before {
+            content: 'Q';
+            position: absolute;
+            right: 0;
+            top: -5px;
+            font-family: 'Outfit';
+            font-size: 2rem;
+            opacity: 0.1;
+        }
+
+        .a-box {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px dashed var(--accent);
+            line-height: 1.8;
+            color: var(--text-main);
+            position: relative;
+        }
+
+        .a-box::before {
+            content: 'الإجابة الذكية';
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .wisdom-section {
+            margin-top: 60px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.05));
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .wisdom-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+
+        .wisdom-header i {
+            font-size: 2rem;
+        }
+
+        .wisdom-header h3 {
+            font-weight: 900;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        #tipsList li {
+            position: relative;
+            padding-right: 35px;
+            margin-bottom: 18px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        #tipsList li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 0;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        @media print {
+
+            .bg-blobs,
+            nav,
+            .main-input-card,
+            .main-footer,
+            .action-buttons {
+                display: none !important;
+            }
+
+            .glass-card {
+                background: white !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                border-radius: 0 !important;
+            }
+
+            body {
+                background: white;
+            }
+        }
+    </style>
+
+    <script src="js/modules/file_processor.js"></script>
+    <script>
+        let timeout = null;
+        const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbzSdWq5xiGZQZ9-DuaVh57f_3UKLuuYWukgIC3x2vtvt5d2VIyEv4yiJn93-hIrgLL9/exec";
+        let uploadedText = "";
+
+        function handleAutoTrigger(input) {
+            clearTimeout(timeout);
+            const val = input.value.trim();
+            const pulse = document.getElementById('aiPulse');
+
+            if (val.length < 5 && !uploadedText) { pulse.style.display = 'none'; return; }
+
+            pulse.style.display = 'flex';
+            timeout = setTimeout(() => {
+                startAIAnalysis(val);
+            }, 1800);
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('loader');
+            const loaderText = document.getElementById('loaderText');
+
+            loader.style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            loaderText.innerText = `جاري قراءة السيرة الذاتية: ${file.name}...`;
+
+            try {
+                if (typeof fileProcessor === 'undefined') console.warn("FileProcessor loading...");
+
+                const result = await fileProcessor.processFile(file, { extractText: true });
+                uploadedText = result.text;
+
+                loaderText.innerText = "تم استخراج النص، جاري توليد الأسئلة...";
+                document.getElementById('jobTitle').value = `ملف: ${file.name}`;
+
+                startAIAnalysis(uploadedText);
+
+            } catch (e) {
+                console.error(e);
+                alert(`فشل قراءة الملف: ${e.message}`);
+                loader.style.display = 'none';
+            }
+        }
+
+        async function startAIAnalysis(inputContent) {
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            const pulse = document.getElementById('aiPulse');
+            const context = uploadedText || inputContent;
+
+            if (!context || context.length < 3) return;
+
+            pulse.style.display = 'none';
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            window.scrollTo({ top: loader.offsetTop - 100, behavior: 'smooth' });
+
+            // Enhanced Unified Prompt using Smart Role-Bound AI Core
+            const prompt = PromptBuilder.buildUnifiedPrompt('أجوبة', context, {
+                itemCount: 30,
+                fileContent: uploadedText ? uploadedText : ''
+            });
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}?action=ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: "You are an HR Expert for NGOs. Return ONLY valid JSON in Arabic." },
+                            { role: "user", content: prompt }
+                        ]
+                    })
+                });
+
+                const bridgeRes = await res.json();
+                if (bridgeRes.status === "error") throw new Error(bridgeRes.message);
+
+                const aiResponse = bridgeRes.data;
+                const cleanJson = aiResponse.replace(/```json\s*|```\s*/gi, "").trim();
+                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+
+                if (!jsonMatch) throw new Error("JSON_NOT_FOUND");
+                const data = JSON.parse(jsonMatch[0]);
+
+                if (data.error) throw new Error(data.error.message || "AI_PROVIDER_ERROR");
+
+                const questions = data.questions || data.items || [];
+                if (questions.length === 0) throw new Error("EMPTY_QUESTIONS");
+
+                document.getElementById('jobLevel').innerText = data.level || "تحليل احترافي للمنظمات";
+
+                const container = document.getElementById('questionsContainer');
+                container.innerHTML = questions.map((item, index) => `
+                    <div class="question-block anim-slide-up" style="animation-delay: ${index * 0.05}s">
+                        <span class="q-label"> ${index + 1}. ${item.q}</span>
+                        <div class="a-box">${item.a}</div>
+                    </div>
+                `).join('');
+
+                const tipsList = document.getElementById('tipsList');
+                const tips = data.tips || [];
+                tipsList.innerHTML = tips.map(t => `<li>${t}</li>`).join('');
+
+                resultArea.style.display = 'block';
+                window.scrollTo({ top: resultArea.offsetTop - 50, behavior: 'smooth' });
+
+            } catch (e) {
+                console.error("Detailed AI Error:", e);
+                alert(`خطأ: ${e.message}`);
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        // Theme Logic
+        document.getElementById('themeToggle').onclick = () => {
+            const body = document.body;
+            body.classList.toggle('dark-theme');
+            body.classList.toggle('light-theme');
+            localStorage.setItem('athar-theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        };
+
+        if (localStorage.getItem('athar-theme') === 'dark') {
+            document.body.classList.replace('light-theme', 'dark-theme');
+        }
+    </script>
+</body>
+
+</html>
