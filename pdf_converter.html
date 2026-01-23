@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | محول المستندات الذكي Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script src="language_manager.js"></script>
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+
+    <style>
+        .converter-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .upload-zone {
+            border: 3px dashed var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            transition: 0.3s;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Preview Styles */
+        #previewSection {
+            display: none;
+            margin-top: 30px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 20px;
+        }
+
+        .preview-viewer {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        #pdfCanvas {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            background: white;
+            border-radius: 4px;
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal Styles */
+        .athar-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .modal-body {
+            margin-bottom: 30px;
+            text-align: right;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            line-height: 1.8;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Progress Box */
+        .loader-box {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            transition: 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .converter-container {
+                padding: 10px;
+            }
+
+            .upload-zone {
+                padding: 30px 15px;
+            }
+
+            .preview-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container converter-container">
+        <nav style="margin-bottom: 20px;">
+            <div class="logo-container">
+                <a href="index.html" style="text-decoration:none; display:flex; align-items:center; gap:15px;">
+                    <img src="تنزيل.jpg" alt="Logo" id="mainLogo" style="width:50px; height:50px; border-radius:50%;">
+                    <div>
+                        <div class="logo">أثر</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">محول المستندات الذكي</div>
+                    </div>
+                </a>
+            </div>
+            <a href="index.html" class="btn btn-ghost">الرئيسية</a>
+        </nav>
+
+        <div class="glass-card" style="padding: 40px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 class="gradient-text" style="font-size: 2.5rem; font-weight: 900; margin-bottom: 10px;">PDF to Word
+                    Converter</h1>
+                <p style="color: var(--text-secondary);">حول ملفاتك إلى مستندات Word قابلة للتعديل بنفس التنسيق الأصلي
+                    100% ✨</p>
+            </div>
+
+            <div class="process-steps">
+                <div class="p-step active" id="step_upload">
+                    <div class="p-icon"><i class="fas fa-file-upload"></i></div>
+                    <div>رفع الملف</div>
+                </div>
+                <div class="p-step" id="step_process">
+                    <div class="p-icon"><i class="fas fa-cogs"></i></div>
+                    <div>المعالجة وتطبيق OCR</div>
+                </div>
+                <div class="p-step" id="step_download">
+                    <div class="p-icon"><i class="fas fa-file-word"></i></div>
+                    <div>تحميل Word</div>
+                </div>
+            </div>
+
+            <input type="file" id="pdfInput" accept=".pdf" style="display: none;">
+
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('pdfInput').click()">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">اضغط للرفع أو اسحب الملف هنا</h3>
+                <p style="color: var(--text-secondary);">يدعم ملفات PDF بكافة الأحجام 📚</p>
+                <div id="fileInfo" class="file-info" onclick="event.stopPropagation()"></div>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewSection">
+                <div class="preview-viewer">
+                    <canvas id="pdfCanvas"></canvas>
+                    <div class="preview-controls">
+                        <button class="btn btn-ghost" onclick="changePage(-1)"><i
+                                class="fas fa-arrow-right"></i></button>
+                        <span>صفحة <span id="pageNum">1</span> من <span id="pageCount">?</span></span>
+                        <button class="btn btn-ghost" onclick="changePage(1)"><i class="fas fa-arrow-left"></i></button>
+                        <div style="width:1px; height:20px; background:#ddd; margin:0 10px;"></div>
+                        <button class="btn btn-ghost" onclick="zoomPreview(0.1)"><i
+                                class="fas fa-search-plus"></i></button>
+                        <button class="btn btn-ghost" onclick="zoomPreview(-0.1)"><i
+                                class="fas fa-search-minus"></i></button>
+                    </div>
+                </div>
+                <button id="convertBtn" class="btn btn-primary" style="margin-top:20px; width:100%;"
+                    onclick="showConfirmModal()">
+                    تأكيد بدء التحويل 🚀
+                </button>
+            </div>
+
+            <div id="loaderBox" class="loader-box">
+                <h3 id="loaderText">جاري التحويل...</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="progressDetail" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.7;">يرجى عدم إغلاق الصفحة
+                    حتى اكتمال العملية</p>
+            </div>
+
+            <!-- Error/Success Messages -->
+            <div id="statusMsg" style="margin-top: 20px; text-align: center; display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="athar-modal">
+        <div class="modal-content">
+            <div class="modal-header">تأكيد بدء التحويل</div>
+            <div class="modal-body">
+                <p>🔹 <strong>اسم الملف:</strong> <span id="m_fileName">...</span></p>
+                <p>🔹 <strong>عدد الصفحات:</strong> <span id="m_pages">...</span> صفحة</p>
+                <p>🔹 <strong>الصيغة الناتجة:</strong> Microsoft Word (.docx)</p>
+                <div
+                    style="margin-top:15px; padding:10px; background:#fffbdd; border:1px solid #ffe58f; border-radius:8px; display:flex; gap:10px; align-items:center;">
+                    <i class="fas fa-clock" style="color:#d4a017;"></i>
+                    <span>الزمن المتوقع للحصول على دقة 100%: <strong id="m_time">...</strong></span>
+                </div>
+                <p style="margin-top:15px; font-size:0.9rem; color:#64748b;">
+                    ⚠️ تنبيه: ستتم المعالجة في عملية واحدة متصلة لضمان جودة الملف.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" style="flex:2;" onclick="startConversion()">موافقة وبدء التحويل</button>
+                <button class="btn btn-ghost" style="flex:1;" onclick="hideConfirmModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        // PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('pdfInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const convertBtn = document.getElementById('convertBtn');
+        const previewSection = document.getElementById('previewSection');
+
+        let selectedFile = null;
+        let pdfDoc = null;
+        let currPage = 1;
+        let pdfScale = 1.0;
+
+        // PWA Meta
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(() => {
+                    console.log('Athar PWA Ready.');
+                }).catch(swErr => console.log('SW registration failed: ', swErr));
+            });
+        }
+
+        // Drag & Drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, e => {
+            e.preventDefault(); e.stopPropagation();
+        }));
+        dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', function () { handleFiles(this.files); });
+
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+            if (files[0].type !== 'application/pdf') return alert('يرجى رفع ملف PDF فقط.');
+
+            selectedFile = files[0];
+            fileInfo.style.display = 'block';
+            fileInfo.innerHTML = `<i class="fas fa-check-circle"></i> تم اختيار: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+
+            // Prepare Preview
+            await loadPDFPreview(selectedFile);
+        }
+
+        async function loadPDFPreview(file) {
+            const arr = await file.arrayBuffer();
+            pdfDoc = await pdfjsLib.getDocument({ data: arr }).promise;
+            document.getElementById('pageCount').innerText = pdfDoc.numPages;
+            previewSection.style.display = 'block';
+            currPage = 1;
+            renderPage(currPage);
+
+            // Auto Scroll to Preview
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function renderPage(num) {
+            const page = await pdfDoc.getPage(num);
+            const vp = page.getViewport({ scale: pdfScale });
+            const canvas = document.getElementById('pdfCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.height = vp.height;
+            canvas.width = vp.width;
+
+            await page.render({ canvasContext: ctx, viewport: vp }).promise;
+            document.getElementById('pageNum').innerText = num;
+        }
+
+        function changePage(delta) {
+            if (!pdfDoc) return;
+            const newPage = currPage + delta;
+            if (newPage >= 1 && newPage <= pdfDoc.numPages) {
+                currPage = newPage;
+                renderPage(currPage);
+            }
+        }
+
+        function zoomPreview(val) {
+            pdfScale = Math.max(0.5, Math.min(2.0, pdfScale + val));
+            renderPage(currPage);
+        }
+
+        function showConfirmModal() {
+            if (!selectedFile || !pdfDoc) return;
+            document.getElementById('m_fileName').innerText = selectedFile.name;
+            document.getElementById('m_pages').innerText = pdfDoc.numPages;
+
+            // Estimate Time: Batches of 5 pages, 15-20s per batch
+            const numPages = pdfDoc.numPages;
+            const batches = Math.ceil(numPages / 5);
+            const minMins = Math.max(1, Math.floor((batches * 15) / 60));
+            const maxMins = Math.ceil((batches * 25) / 60);
+            document.getElementById('m_time').innerText = `${minMins} - ${maxMins} دقيقة`;
+
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function hideConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+        }
+
+        async function startConversion() {
+            hideConfirmModal();
+            if (!selectedFile) return;
+
+            // Step tracking
+            document.querySelectorAll('.p-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step_process').classList.add('active');
+
+            previewSection.style.display = 'none';
+            dropZone.style.display = 'none';
+            document.getElementById('loaderBox').style.display = 'block';
+
+            try {
+                updateProgress(5, "جاري استخراج بيانات الصفحات...");
+                const pages = await extractPagesFromPDF(selectedFile);
+                let fullHtmlBody = "";
+
+                const BATCH_SIZE = 5;
+                const totalBatches = Math.ceil(pages.length / BATCH_SIZE);
+
+                for (let i = 0; i < totalBatches; i++) {
+                    const startIdx = i * BATCH_SIZE;
+                    const endIdx = Math.min((i + 1) * BATCH_SIZE, pages.length);
+                    const batchContent = pages.slice(startIdx, endIdx).join("\n\n");
+
+                    const percent = Math.round(((i + 1) / totalBatches) * 85) + 5;
+                    updateProgress(percent, `معالجة الصفحات (${startIdx + 1} - ${endIdx}) من إجمالي ${pages.length}...`);
+
+                    document.getElementById('progressDetail').innerText = `جارٍ تطبيق معايير منصة أثر على الدفعة ${i + 1}/${totalBatches}`;
+
+                    const batchHtml = await processWithAI(batchContent);
+                    fullHtmlBody += batchHtml;
+                }
+
+                updateProgress(95, "تجميع المستند النهائي...");
+                const finalDocHtml = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head><meta charset='utf-8'><style>
+                        body { font-family: 'Cairo', 'Arial', sans-serif; direction: rtl; }
+                        table { border-collapse: collapse; width: 100%; border: 1px solid #000; margin-bottom: 10px; }
+                        td, th { border: 1px solid #000; padding: 6px; text-align: right; }
+                        p { margin-bottom: 8px; line-height: 1.6; text-align: justify; }
+                    </style></head>
+                    <body class="rtl">
+                        ${fullHtmlBody}
+                    </body></html>
+                `;
+
+                updateProgress(100, "اكتمل التحويل بنجاح!");
+                const docxBlob = htmlDocx.asBlob(finalDocHtml);
+
+                document.getElementById('step_process').classList.remove('active');
+                document.getElementById('step_download').classList.add('active');
+
+                document.getElementById('statusMsg').style.display = 'block';
+                document.getElementById('statusMsg').innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 30px; border-radius: 20px; border: 1px solid #10b981;">
+                        <h3 style="color:#10b981; margin-bottom:20px;">✨ تمت العملية بنجاح!</h3>
+                        <p style="margin-bottom:20px;">تم تحويل ${pages.length} صفحة بدقة عالية.</p>
+                        <button id="finalDownloadBtn" class="btn btn-primary" style="width:100%; padding:20px; font-size:1.2rem;">📥 تحميل ملف Word الآن</button>
+                        <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:15px;">بدء عملية جديدة</button>
+                    </div>
+                `;
+
+                document.getElementById('finalDownloadBtn').onclick = () => {
+                    ProtectionManager.verify(() => {
+                        saveAs(docxBlob, selectedFile.name.replace('.pdf', '.docx'));
+                    });
+                };
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ تقني، يرجى المحاولة مرة أخرى: " + error.message);
+                location.reload();
+            }
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('loaderText').innerText = text;
+        }
+
+        async function extractPagesFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let pages = [];
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const p = await pdf.getPage(i);
+                const tc = await p.getTextContent();
+                pages.push(tc.items.map(it => it.str).join(' '));
+            }
+            return pdf.numPages > 0 ? pages : [];
+        }
+
+        async function processWithAI(text) {
+            const prompt = `أنت خبير في معالجة المستندات (Formatting Expert). 
+            حول النص التالي المستخرج من PDF إلى HTML متوافق مع MS Word.
+            القواعد:
+            1. أعد بناء الجداول بدقة باستخدام <table>.
+            2. حافظ على العناوين والفقرات.
+            3. المخرج كود HTML (body content) فقط.
+            نص المستند:
+            "${text.substring(0, 15000)}"`;
+
+            try {
+                const res = await fetch(`${AtharConfig.BRIDGE_URL}?action=ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [{ role: "user", content: prompt }]
+                    })
+                });
+                const data = await res.json();
+                let html = data.data || "";
+                return html.replace(/```html/g, '').replace(/```/g, '').trim();
+            } catch (e) {
+                console.warn(e);
+                return `<p>${text}</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | كاتب المقترحات الذكي</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="dark-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 1000px;">
+        <nav>
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثر</div>
+                    <div class="logo-slogan">منصة كتابة المقترحات الذكية</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost">الرئيسية</a>
+                <a href="library_v3.html" class="btn btn-ghost">المكتبة الإنسانية</a>
+            </div>
+        </nav>
+
+        <header style="text-align:center; margin: 40px 0;">
+            <h1 class="gradient-text" style="font-size: 2.8rem; font-weight: 900;">💎 كاتب المقترحات (Concept Note)</h1>
+            <p style="color:var(--text-secondary); font-size: 1.1rem;">صمم مقترح مشروع متكامل وفق معايير المانحين
+                الدوليين في دقائق.</p>
+        </header>
+
+        <div class="stepper" style="max-width: 600px; margin: 0 auto 40px;">
+            <div class="step active" id="ind-1">
+                <div class="step-circle">1</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">التحليل</div>
+            </div>
+            <div class="step" id="ind-2">
+                <div class="step-circle">2</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">الأفكار</div>
+            </div>
+            <div class="step" id="ind-3">
+                <div class="step-circle">3</div>
+                <div style="font-size: 0.8rem; margin-top: 5px;">المقترح</div>
+            </div>
+        </div>
+
+        <div id="statusLog" style="text-align:center; min-height: 25px; margin-bottom: 20px; font-weight: bold;"></div>
+
+        <!-- Step 1: Initial Info -->
+        <div id="step1" class="section active anim-fade-in">
+            <div class="glass-card" style="padding: 40px;">
+                <div class="form-group">
+                    <label>فكرة المشروع أو المشكلة المراد حلها:</label>
+                    <textarea id="projectIdea" rows="4"
+                        placeholder="مثال: تحسين الوصول للمياه الصالحة للشرب في مناطق النزوح..."></textarea>
+                </div>
+
+                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div class="form-group">
+                        <label>الميزانية ($):</label>
+                        <input type="number" id="projectBudget" value="50000"
+                            style="font-weight: bold; color: var(--primary);">
+                    </div>
+                    <div class="form-group">
+                        <label>المدة (أشهر):</label>
+                        <input type="number" id="projectDuration" value="12">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>الموقع الجغرافي:</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
+                        <input type="text" id="country" value="سوريا">
+                        <input type="text" id="governorate" placeholder="المحافظة">
+                        <input type="text" id="village" placeholder="القرية / الحي">
+                    </div>
+                </div>
+
+                <button id="analyzeBtn" class="btn btn-primary"
+                    style="width:100%; justify-content: center; padding: 18px; font-size: 1.1rem; margin-top: 20px;">
+                    تحليل الفكرة وتوليد الأطروحات 💡
+                </button>
+
+                <div id="analysisResult" style="margin-top:30px; display:none;"></div>
+            </div>
+        </div>
+
+        <!-- Step 2: Idea Selection -->
+        <div id="step2" class="section anim-fade-in">
+            <div class="glass-card" style="padding: 40px;">
+                <h3 style="color:var(--primary); margin-bottom:25px; text-align:center; font-weight: 800;">اختر التوجه
+                    الأنسب لمشروعك:</h3>
+                <div id="ideasGrid"
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-bottom:40px;">
+                </div>
+
+                <div style="display:flex; gap:15px;">
+                    <button
+                        onclick="document.getElementById('step2').classList.remove('active'); document.getElementById('step1').classList.add('active');"
+                        class="btn btn-ghost" style="flex:1; justify-content: center;">⬅️ تعديل المعلومات</button>
+                    <button id="generateProposalBtn" class="btn btn-primary" style="flex:2; justify-content: center;"
+                        disabled>
+                        توليد المقترح الكامل بشكل احترافي 💎
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Final Proposal Viewing -->
+        <div id="step3" class="section anim-fade-in">
+            <!-- Content of Proposal View is injected here by JS -->
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-credit">تطوير وتنفيذ أ. نبيل الحميد &copy; 2025</div>
+    </footer>
+
+    <!-- Word Export Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.1.0/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script src="proposal_generator.js"></script>
+
+    <style>
+        .idea-card {
+            transition: 0.3s;
+            border-right: 4px solid transparent;
+        }
+
+        .idea-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .spinner {
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</body>
+
+</html>
