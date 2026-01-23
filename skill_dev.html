@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثر | أكاديمية بناء المهارات</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Outfit:wght@300;600;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="protection.js"></script>
+    <script src="js/global_settings.js"></script>
+    <script src="js/modules/prompt_builder.js"></script>
+</head>
+
+<body class="light-theme">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container" style="max-width: 950px; padding-bottom: 100px;">
+        <nav class="premium-nav">
+            <div class="logo-container">
+                <div class="ripple-wrapper">
+                    <div class="ripple"></div>
+                    <img src="تنزيل.jpg" id="mainLogo" alt="Athar">
+                </div>
+                <div>
+                    <div class="logo">أثـــــر</div>
+                    <div class="logo-slogan">اتقان يبدأ من هنا</div>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-ghost"><i class="fas fa-home"></i> الرئيسية</a>
+            </div>
+        </nav>
+
+        <main class="anim-fade-in" style="margin-top: 50px;">
+            <div class="glass-card main-input-card" style="border-top-color: #6366f1;">
+                <div class="card-header-icon" style="color: #6366f1;">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>خطة تطوير المهارات</h1>
+                <p class="subtitle">أدخل المهارة التي تود إتقانها لنبني لك خطة تدريبية مكثفة من 30 وحدة معرفية وعملية.
+                </p>
+
+                <div class="input-wrapper">
+                    <input type="text" id="skillName"
+                        placeholder="مثلاً: إدارة المشتريات، مراقبة وتقييم، لغة إنجليزية مهنية..." class="premium-input"
+                        oninput="handleAutoTrigger(this)">
+                    <div id="aiPulse" class="ai-pulse" style="display: none;">
+                        <span style="background: #6366f1;"></span>
+                        <span style="background: #6366f1;"></span>
+                        <span style="background: #6366f1;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loader" class="premium-loader" style="display: none;">
+                <div class="loader-spinner" style="border-top-color: #6366f1;"></div>
+                <h3>جاري تصميم 30 وحدة تعليمية احترافية...</h3>
+                <div class="loader-bar">
+                    <div class="loader-progress" style="background: #6366f1;"></div>
+                </div>
+            </div>
+
+            <div id="resultArea" style="display: none;" class="anim-slide-up">
+                <div class="glass-card result-card">
+                    <h3 class="section-title" style="color: #4f46e5;"><i class="fas fa-book-reader"></i> الوحدات
+                        التدريبية المخصصة:</h3>
+                    <div id="skillsContainer" class="steps-grid"></div>
+
+                    <button onclick="ProtectionManager.verify(() => window.print())" class="btn btn-primary"
+                        style="width: 100%; margin-top: 50px; justify-content: center; background: #6366f1; border-color: #6366f1; height: 60px;">
+                        <i class="fas fa-file-pdf"></i> تصدير المنهج التدريبي
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-logo">أثر</div>
+            <div class="footer-credit">تطوير وتنفيذ أ. نبيل الحميد &copy; 2025</div>
+        </div>
+    </footer>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-body: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-main);
+        }
+
+        .premium-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            padding: 50px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+        }
+
+        .main-input-card {
+            text-align: center;
+            border-top: 8px solid var(--primary);
+        }
+
+        .card-header-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-weight: 950;
+            font-size: 2.6rem;
+        }
+
+        .premium-input {
+            width: 100%;
+            padding: 25px 35px;
+            border-radius: 20px;
+            border: 2px solid var(--glass-border);
+            background: white;
+            font-size: 1.3rem;
+            font-family: 'Cairo';
+            text-align: center;
+            transition: 0.4s;
+        }
+
+        .premium-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 22px;
+            padding: 28px;
+            background: white;
+            border-radius: 22px;
+            border: 1px solid var(--glass-border);
+            border-right: 6px solid var(--primary);
+            transition: 0.3s;
+        }
+
+        .step-num {
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 1.6rem;
+            font-family: 'Outfit';
+            min-width: 45px;
+        }
+
+        .step-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .premium-loader {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .loader-spinner {
+            width: 70px;
+            height: 70px;
+            border: 6px solid var(--glass-border);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ai-pulse {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+
+        .ai-pulse span {
+            width: 5px;
+            height: 18px;
+            animation: ai-pulse 0.8s infinite ease-in-out;
+        }
+    </style>
+
+    <script src="js/modules/file_processor.js"></script>
+    <script>
+        let timeout = null;
+        const BRIDGE_URL = "https://script.google.com/macros/s/AKfycbzSdWq5xiGZQZ9-DuaVh57f_3UKLuuYWukgIC3x2vtvt5d2VIyEv4yiJn93-hIrgLL9/exec";
+        let uploadedText = "";
+
+        // Add styles dynamically for upload button - kept consistent
+        const style = document.createElement('style');
+        style.textContent = `
+            .premium-input { padding-left: 60px; } 
+            .file-upload-btn {
+                position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+                background: var(--primary); color: white; width: 40px; height: 40px;
+                border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                cursor: pointer; transition: 0.3s; z-index: 10; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+            }
+            .file-upload-btn:hover { transform: translateY(-50%) scale(1.1); background: #4f46e5; }
+        `;
+        document.head.appendChild(style);
+
+        // Inject HTML for file input using JS to avoid large range replacements
+        const wrapper = document.querySelector('.input-wrapper');
+        const aiPulse = document.getElementById('aiPulse');
+        if (wrapper && !wrapper.querySelector('.file-upload-btn')) {
+            const label = document.createElement('label');
+            label.className = 'file-upload-btn';
+            label.htmlFor = 'fileUpload';
+            label.title = 'ارفع وصف وظيفي أو سيرة ذاتية (PDF)';
+            label.innerHTML = '<i class="fas fa-file-upload"></i>';
+            wrapper.insertBefore(label, aiPulse);
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'fileUpload';
+            input.accept = '.pdf,.docx,.doc,.txt';
+            input.style.display = 'none';
+            input.onchange = function () { handleFileUpload(this); };
+            wrapper.appendChild(input);
+
+            // Adjust placeholder
+            document.getElementById('skillName').placeholder = "أدخل مهارة، أو ارفع ملف لتحليل الفجوة...";
+        }
+
+        function handleAutoTrigger(input) {
+            clearTimeout(timeout);
+            const val = input.value.trim();
+            const pulse = document.getElementById('aiPulse');
+            if (val.length < 5 && !uploadedText) { pulse.style.display = 'none'; return; }
+            pulse.style.display = 'flex';
+            timeout = setTimeout(() => { startSkillDev(val); }, 1800);
+        }
+
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const loader = document.getElementById('loader');
+            const loaderTitle = loader.querySelector('h3');
+
+            loader.style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+            if (loaderTitle) loaderTitle.innerText = `جاري تحليل الملف وتحديد الفجوات: ${file.name}...`;
+
+            try {
+                if (typeof fileProcessor === 'undefined') console.warn("FileProcessor logic loading...");
+
+                const result = await fileProcessor.processFile(file, { extractText: true });
+                uploadedText = result.text;
+
+                if (loaderTitle) loaderTitle.innerText = "تم التحليل، جاري بناء الخطة التدريبية...";
+                document.getElementById('skillName').value = `ملف: ${file.name}`;
+
+                startSkillDev(uploadedText);
+
+            } catch (e) {
+                console.error(e);
+                alert(`خطأ في الملف: ${e.message}`);
+                loader.style.display = 'none';
+            }
+        }
+
+        async function startSkillDev(inputContent) {
+            const loader = document.getElementById('loader');
+            const resultArea = document.getElementById('resultArea');
+            const pulse = document.getElementById('aiPulse');
+            const context = uploadedText || inputContent;
+
+            if (!context || context.length < 3) return;
+
+            pulse.style.display = 'none';
+            loader.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            const prompt = PromptBuilder.buildUnifiedPrompt('مهارات', context, {
+                itemCount: 30,
+                fileContent: uploadedText ? uploadedText : ''
+            });
+
+            try {
+                const res = await fetch(`${BRIDGE_URL}?action=ai`, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: "You are a training expert that returns ONLY valid JSON in Arabic." },
+                            { role: "user", content: prompt }
+                        ]
+                    })
+                });
+
+                const bridgeRes = await res.json();
+                if (bridgeRes.status === "error") throw new Error(bridgeRes.message);
+
+                const aiResponse = bridgeRes.data;
+                const cleanJson = aiResponse.replace(/```json\s*|```\s*/gi, "").trim();
+                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+
+                if (!jsonMatch) throw new Error("JSON_ERROR");
+                const data = JSON.parse(jsonMatch[0]);
+                if (data.error) throw new Error(data.error.message || "AI_ERROR");
+
+                const container = document.getElementById('skillsContainer');
+                const list = data.items || data.tasks || data.modules || [];
+                container.innerHTML = list.map((t, idx) => `
+                    <div class="step-card anim-slide-up" style="animation-delay: ${idx * 0.05}s">
+                        <span class="step-num">${idx + 1}</span>
+                        <div>
+                            <span class="step-title">${t.q || t.title}</span>
+                            <div class="step-desc">${t.a || t.desc || t.description}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                resultArea.style.display = 'block';
+                window.scrollTo({ top: resultArea.offsetTop - 50, behavior: 'smooth' });
+
+            } catch (e) {
+                console.error(e);
+                alert(`تعذر بناء الخطة التدريبية حالياً.\n\nالتفاصيل: ${e.message}`);
+            } finally { loader.style.display = 'none'; }
+        }
+    </script>
+</body>
+
+</html>
