@@ -1280,11 +1280,25 @@
                     .map(i => {
                         if (typeof i === 'string') return i;
                         if (typeof i === 'object' && i !== null) {
-                            return i.text || i.q || i.item || i.skill || i.name || i.desc || JSON.stringify(i);
+                            // First try specific keys
+                            let text = i.text || i.q || i.item || i.skill || i.name || i.desc;
+                            if (text) return text;
+
+                            // If no specific keys, join all values
+                            const values = Object.values(i).filter(v => v && typeof v !== 'object');
+                            if (values.length > 0) return values.join(' - ');
+
+                            return ''; // Skip complex nested objects without known keys
                         }
                         return String(i);
                     })
-                    .filter(i => i && i !== 'undefined' && i !== 'null' && i !== '[object Object]')
+                    .filter(i => {
+                        return i &&
+                            i !== 'undefined' &&
+                            i !== 'null' &&
+                            String(i).trim() !== '[object Object]' &&
+                            String(i).trim() !== '';
+                    })
                     .map((val, idx) => /^\d+[\.\-]/.test(val) ? val : `${idx + 1}. ${val}`)
                     .join('\n');
             };
