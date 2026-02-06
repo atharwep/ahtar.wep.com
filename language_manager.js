@@ -173,3 +173,11 @@ class LanguageManager {
 }
 
 const LangManager = new LanguageManager();
+
+// 🛠️ Auto-Load Expert Review Manager (Global)
+(function () {
+    const script = document.createElement('script');
+    script.src = 'js/modules/expert_review.js';
+    script.async = true;
+    document.head.appendChild(script);
+})();
