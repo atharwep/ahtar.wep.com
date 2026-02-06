@@ -176,6 +176,9 @@
             <div class="admin-nav-item active" onclick="showSection('users')">
                 <i class="fas fa-users"></i> إدارة المستخدمين
             </div>
+            <div class="admin-nav-item" onclick="showSection('jobs')">
+                <i class="fas fa-briefcase"></i> إدارة الإعلانات والوظائف
+            </div>
             <div class="admin-nav-item" onclick="showSection('config')">
                 <i class="fas fa-key"></i> مفاتيح الـ API
             </div>
@@ -260,6 +263,61 @@
                     </tr>
                 </tbody>
             </table>
+        </section>
+
+        <!-- Section: Jobs Management -->
+        <section id="jobsSection" style="display: none;">
+            <div class="glass-card"
+                style="background: white; border: 1px solid #e2e8f0; margin-bottom: 30px; padding: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #1e293b; font-size: 1.2rem;">📝 نشر إعلان وظيفة جديد</h3>
+                    <span class="badge badge-institution">Manual Entry</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label style="font-weight: bold; margin-bottom: 5px; display: block;">المسمى الوظيفي</label>
+                        <input type="text" id="jobTitle" class="config-input" placeholder="مثال: مسؤول حماية">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: bold; margin-bottom: 5px; display: block;">المنظمة</label>
+                        <input type="text" id="jobOrg" class="config-input" placeholder="مثال: منظمة بنفسج">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label style="font-weight: bold; margin-bottom: 5px; display: block;">الموقع</label>
+                        <input type="text" id="jobLocation" class="config-input" placeholder="مثال: إدلب - سرمدا">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: bold; margin-bottom: 5px; display: block;">تاريخ الانتهاء</label>
+                        <input type="date" id="jobDeadline" class="config-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: bold; margin-bottom: 5px; display: block;">رابط التقديم</label>
+                    <input type="text" id="jobLink" class="config-input" placeholder="https://... أو mailto:...">
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: bold; margin-bottom: 5px; display: block;">وصف مختصر</label>
+                    <textarea id="jobSummary" class="config-input" rows="3" placeholder="تفاصيل الوظيفة..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 10px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="jobHighPriority">
+                        <span style="font-weight: bold; color: #ef4444;">🔥 وظيفة عاجلة (High Priority)</span>
+                    </label>
+                </div>
+
+                <button onclick="publishJob()" class="btn btn-primary"
+                    style="width: 100%; margin-top: 20px; justify-content: center;">
+                    <i class="fas fa-paper-plane"></i> نشر الوظيفة الآن (بشكل منفصل)
+                </button>
+            </div>
         </section>
 
         <!-- Section: Config -->
@@ -418,6 +476,7 @@
 
             const titles = {
                 'users': 'إدارة المستخدمين',
+                'jobs': 'إدارة الإعلانات والوظائف',
                 'config': 'إعدادات النظام (Env)',
                 'logs': 'سجل النشاط'
             };
@@ -605,6 +664,57 @@
                 `;
                 statusDiv.style.background = '#fef2f2';
                 statusDiv.style.borderColor = '#ef4444';
+            }
+        }
+
+        // --- JOBS MANAGEMENT ---
+        async function publishJob() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+
+            // Collect Data
+            const jobData = {
+                title: document.getElementById('jobTitle').value,
+                org: document.getElementById('jobOrg').value,
+                location: document.getElementById('jobLocation').value,
+                deadline: document.getElementById('jobDeadline').value,
+                link: document.getElementById('jobLink').value,
+                summary: document.getElementById('jobSummary').value,
+                priority: document.getElementById('jobHighPriority').checked ? 'high' : 'normal',
+                user: adminUser.email
+            };
+
+            if (!jobData.title || !jobData.org) return alert("يرجى تعبئة المسمى والمنظمة على الأقل");
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري النشر...';
+            btn.disabled = true;
+
+            try {
+                // Send to Bridge
+                const query = new URLSearchParams({
+                    action: 'add_job',
+                    ...jobData
+                }).toString();
+
+                const res = await fetch(`${BRIDGE_URL}?${query}`);
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    alert("✅ تم نشر الوظيفة بنجاح!");
+                    // Clear inputs
+                    document.querySelectorAll('#jobsSection input, #jobsSection textarea').forEach(i => i.value = '');
+                    document.getElementById('jobHighPriority').checked = false;
+                } else {
+                    throw new Error(data.message || "Unknown error");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("❌ فشل النشر: " + e.message);
+                // Fallback for demo if bridge is not updated
+                alert("⚠️ ملاحظة: إذا فشل النشر بسبب عدم تحديث Bridge Script، يرجى تحديث الكود في Apps Script لإضافة حالة 'add_job'.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 
