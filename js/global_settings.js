@@ -109,4 +109,15 @@ const SettingsManager = {
 };
 
 // Auto-run on load
+// Auto-run on load
 document.addEventListener('DOMContentLoaded', () => SettingsManager.init());
+
+// 🛠️ Auto-Load Expert Review Manager (Global Fallback)
+(function () {
+    if (!document.querySelector('script[src*="expert_review.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'js/modules/expert_review.js';
+        script.async = true;
+        document.head.appendChild(script);
+    }
+})();
